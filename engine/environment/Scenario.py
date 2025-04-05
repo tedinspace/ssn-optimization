@@ -24,11 +24,9 @@ class Scenario:
             delta_t (float, optional): The time step for the simulation in seconds. If not provided, uses `DEFAULT_DELTA_T`.
         """
         if delta_t is None:
-            self._time_delta = DEFAULT_DELTA_T  # [s]
+            self._dt = DEFAULT_DELTA_T  # [s]
         else:
-            self._time_delta = delta_t  # [s]
-
-        self._dt = self._time_delta / SPD  # [fraction of day]
+            self._dt = delta_t  # [s]
 
         self._scenario_length_hours = scenario_length  # [hours]
 
@@ -36,17 +34,9 @@ class Scenario:
 
         self._scenario_end = Time(scenario_epoch.mjd + scenario_length / HPD, format='mjd')
 
-        self._n_steps = round(self._scenario_length_hours * 60 * (60 / self._time_delta))
+        self._n_steps = round(self._scenario_length_hours * 60 * (60 / self._dt))
 
-    @property
-    def time_delta(self):
-        """
-        Gets the time delta for the scenario.
 
-        Returns:
-            float: Time step for the simulation in seconds.
-        """
-        return self._time_delta
 
     @property
     def dt(self):

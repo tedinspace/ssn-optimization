@@ -1,0 +1,23 @@
+
+# Virtual Environment
+venv/
+*/venv/
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Environment-specific files
+.env
+
+# IDE settings (if any)
+.vscode/
+.idea/
+
+# Macos
+.DS_Store
+**/.DS_Store
+
+# staged files
+driver1.py
+poliastro-library-vetting.ipynb

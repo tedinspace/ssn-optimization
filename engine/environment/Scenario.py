@@ -1,4 +1,4 @@
-from engine.util.time import DEFAULT_DELTA_T, HPD, SPD
+from engine.util.time import DEFAULT_DELTA_T, HPD
 from astropy.time import Time
 
 class Scenario:

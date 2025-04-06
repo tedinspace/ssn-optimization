@@ -114,8 +114,9 @@ class SatelliteTruth:
         self.maneuvers_remaining = remaining
         self.orbit = self.orbit.propagate(t)
 
-
-# ------------------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
+#                                  MANEUVER CLASS                                 |
+# --------------------------------------------------------------------------------
 class ManeuverDetails:
     def __init__(self, magnitude_dv, hours_into_scenario, scenario_configs):
         """
@@ -137,3 +138,4 @@ class ManeuverDetails:
         self.maneuver = self.dir * magnitude_dv  # Scale the direction by magnitude_dv
         self.time = scenario_configs.scenario_epoch + hours_into_scenario * units.h  # Calculate the maneuver time
         self.occurred = False  # The maneuver has not yet occurred
+# 

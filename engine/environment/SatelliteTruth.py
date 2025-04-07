@@ -68,6 +68,7 @@ class SatelliteTruth:
             maneuvers (list): Updates the maneuvers list.
             n_maneuvers (int): Updates the number of maneuvers.
         """
+        maneuver_list = sorted(maneuver_list, key=lambda x: x.time)
         self.maneuvers_occurred = []
         self.maneuvers_remaining = maneuver_list
         self.maneuvers = maneuver_list
@@ -138,4 +139,3 @@ class ManeuverDetails:
         self.maneuver = self.dir * magnitude_dv  # Scale the direction by magnitude_dv
         self.time = scenario_configs.scenario_epoch + hours_into_scenario * units.h  # Calculate the maneuver time
         self.occurred = False  # The maneuver has not yet occurred
-# 

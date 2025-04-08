@@ -21,3 +21,4 @@ __pycache__/
 # staged files
 driver1.py
 poliastro-library-vetting.ipynb
+covariance.py

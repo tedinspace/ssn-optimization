@@ -2,3 +2,4 @@ poliastro==0.17.0
 matplotlib==3.7.0
 sgp4==2.24
 nbformat==5.10.4
+astroplan==0.10.1

@@ -1,11 +1,11 @@
 from sgp4.api import Satrec
 from astropy import units as u
-from astropy.coordinates import CartesianRepresentation, TEME, GCRS
+from astropy.coordinates import CartesianRepresentation, TEME, GCRS, SkyCoord
 from astropy.time import Time
 from astropy.units.quantity import Quantity
 from poliastro.twobody import Orbit
 from poliastro.bodies import Earth
-    
+
 
 
 def tle_to_orbit(line1, line2, epoch=None):
@@ -29,3 +29,12 @@ def tle_to_orbit(line1, line2, epoch=None):
 
     # GCRS --> ORBIT
     return Orbit.from_vectors(Earth, r_gcrs, v_gcrs, epoch)
+
+def orbit_to_sky_coord(orbit):
+    ''' orbit -  poliastro.twobody.Orbit
+        out - astropy.coordinates.SkyCoord
+    '''
+    return SkyCoord(x=orbit.r[0], y=orbit.r[1], z=orbit.r[2], 
+                    unit=u.km, 
+                    representation_type='cartesian', 
+                    frame='gcrs')

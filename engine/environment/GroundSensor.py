@@ -1,7 +1,9 @@
 from astropy.coordinates import EarthLocation, AltAz, SkyCoord, get_sun
 from astropy import units 
-
 from enum import Enum
+
+from engine.util.astro import orbit_to_sky_coord
+
 
 class SensorModality(Enum):
     RADAR  = 1 # RADAR
@@ -15,15 +17,14 @@ class GroundSensor:
     def __init__(self, lla, mode=SensorModality.RADAR, scenario=None):
         '''scenario required for optics'''
         self.mode = mode
-        
-            
+               
         self.general_status = SensorGeneralStatus.AVAILABLE 
         self.availability_trans_times = []
         self.availability_trans_to_status = []
         
         self.location = EarthLocation.from_geodetic(lla[1], lla[0], lla[2]) # (lon,lat,alt)
         
-        
+        self.elevation_threshold = 7.5 * units.deg
         self.night_threshold = -12 *units.deg # astro twilight
         if self.mode == SensorModality.OPTICS:
             self._init_optics(scenario.scenario_epoch, scenario.scenario_end)
@@ -81,10 +82,19 @@ class GroundSensor:
                 self.availability_trans_times = self.availability_trans_times[1:]
                 self.availability_trans_to_status = self.availability_trans_to_status[1:]
      
+    def has_line_of_sight(self, orbit, time):
+        ''' 
+        orbit - poliastro.twobody.Orbit
+        time - astropy.time.Time
+        '''
+        if orbit.epoch.mjd != time.mjd:
+            orbit = orbit.propagate(time)
+        return orbit_to_sky_coord(orbit).transform_to(self._get_azel(time)).alt > self.elevation_threshold
+            
+        
+    
     def tick(self, time):
         '''advance sensor in time - astropy.time.Time'''
         self._update_availability(time) # check for status changes
         #if self.general_status == SensorGeneralStatus.AVAILABLE:
 
-        
-        

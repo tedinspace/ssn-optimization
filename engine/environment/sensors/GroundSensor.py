@@ -1,21 +1,13 @@
 from astropy.coordinates import EarthLocation, AltAz, SkyCoord, get_sun
 from astropy import units 
-from enum import Enum
-
 from engine.util.astro import orbit_to_sky_coord
+from engine.environment.sensors.SensorEnums import SensorGeneralStatus, GroundSensorModality
 
-
-class SensorModality(Enum):
-    RADAR  = 1 # RADAR
-    OPTICS = 2 # Optical Telescope
-
-class SensorGeneralStatus(Enum):
-    AVAILABLE  = "AVAILABLE" # (night for optics)
-    NOT_AVAILABLE = "NOT_AVAILABLE" # (day for optics)
 
 class GroundSensor: 
-    def __init__(self, lla, mode=SensorModality.RADAR, scenario=None):
+    def __init__(self,name, lla, mode=GroundSensorModality.RADAR, scenario=None):
         '''scenario required for optics'''
+        self.name = name
         self.mode = mode
                
         self.general_status = SensorGeneralStatus.AVAILABLE 
@@ -26,7 +18,7 @@ class GroundSensor:
         
         self.elevation_threshold = 7.5 * units.deg
         self.night_threshold = -12 *units.deg # astro twilight
-        if self.mode == SensorModality.OPTICS:
+        if self.mode == GroundSensorModality.OPTICS:
             self._init_optics(scenario.scenario_epoch, scenario.scenario_end)
 
     def _get_azel(self, time):
@@ -90,8 +82,7 @@ class GroundSensor:
         if orbit.epoch.mjd != time.mjd:
             orbit = orbit.propagate(time)
         return orbit_to_sky_coord(orbit).transform_to(self._get_azel(time)).alt > self.elevation_threshold
-            
-        
+                
     
     def tick(self, time):
         '''advance sensor in time - astropy.time.Time'''

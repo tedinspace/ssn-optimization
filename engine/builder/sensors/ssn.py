@@ -1,6 +1,5 @@
-from engine.environment.sensors.SensorEnums import GroundSensorModality
 from engine.environment.sensors.SensorInfo import SensorInfo
-from engine.environment.sensors.GroundSensor import GroundSensor
+from engine.environment.sensors.GroundSensor import GroundSensor, GroundSensorModality
 
 '''NOTE: These locations may be inaccurate; they are for testing purposes.'''
 

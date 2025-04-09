@@ -1,9 +1,32 @@
+from enum import Enum
+
 from astropy.coordinates import AltAz, SkyCoord, get_sun
 from astropy import units 
 from engine.util.astro import orbit_to_sky_coord, create_earth_location
-from engine.environment.sensors.SensorEnums import SensorGeneralStatus, GroundSensorModality
-
 from engine.environment.sensors.Communication import CommunicationPipeline, SensorResponse
+
+class GroundSensorModality(Enum):
+    """
+    Enum representing different modalities of ground sensors.
+
+    Attributes:
+        RADAR (int): Represents a RADAR sensor.
+        OPTICS (int): Represents an Optical Telescope sensor.
+    """
+    RADAR = 1  # RADAR
+    OPTICS = 2  # Optical Telescope
+
+class SensorGeneralStatus(Enum):
+    """
+    Enum representing the general status of a sensor.
+
+    Attributes:
+        AVAILABLE (str): Indicates that the sensor is available (e.g., night for optics).
+        NOT_AVAILABLE (str): Indicates that the sensor is not available (e.g., day for optics).
+    """
+    AVAILABLE = "AVAILABLE"  # (night for optics)
+    NOT_AVAILABLE = "NOT_AVAILABLE"  # (day for optics)
+
 
 class GroundSensor: 
     def __init__(self,name, lla, mode=GroundSensorModality.RADAR, scenario=None):
@@ -120,6 +143,8 @@ class GroundSensor:
             self.pipeline.drop_messages(SensorResponse.DROPPED_NOT_VISIBLE, task_messages_unvetted, time)
             
             # TODO try to schedule vetted messages
+            # TODO no scheduling if sensor is scheduled to be offline 
+            
             #self.pipeline.drop_messages(SensorResponse.DROPPED_SCHEDULING, task_messages_vetted, time)
         else:
             # sensor offline; 
@@ -133,4 +158,5 @@ class GroundSensor:
     
     def check_pipeline(self, time):
         return self.pipeline.check_for_outgoing_messages(time) 
+
 

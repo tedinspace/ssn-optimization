@@ -5,7 +5,7 @@ class SensorInfo:
     Attributes:
         name (str): The name of the sensor.
         lla (list): length 3 list representing the sensor's location in latitude, longitude, and altitude (LLA).
-        modality (engine.environment.sensors.SensorEnums.GroundSensorModality): The modality or type of sensor 
+        modality (engine.environment.sensors.GroundSensor.GroundSensorModality): The modality or type of sensor 
 
     Methods:
         __init__(self, name, lla, modality):
@@ -19,7 +19,7 @@ class SensorInfo:
         Args:
             name (str): The name of the sensor.
             lla (tuple): A tuple representing the sensor's location in latitude, longitude, and altitude.
-            modality (engine.environment.sensors.SensorEnums.GroundSensorModality): The modality or type of sensor 
+            modality (engine.environment.sensors.GroundSensor.GroundSensorModality): The modality or type of sensor 
         """
         self.name = name
         self.lla = lla

@@ -1,8 +1,9 @@
-from astropy.coordinates import EarthLocation, AltAz, SkyCoord, get_sun
+from astropy.coordinates import AltAz, SkyCoord, get_sun
 from astropy import units 
-from engine.util.astro import orbit_to_sky_coord
+from engine.util.astro import orbit_to_sky_coord, create_earth_location
 from engine.environment.sensors.SensorEnums import SensorGeneralStatus, GroundSensorModality
-
+from engine.environment.sensors.SensorDelays import SensorDelays
+from engine.environment.sensors.SensorMessages import PendingTaskMessage
 
 class GroundSensor: 
     def __init__(self,name, lla, mode=GroundSensorModality.RADAR, scenario=None):
@@ -14,12 +15,16 @@ class GroundSensor:
         self.availability_trans_times = []
         self.availability_trans_to_status = []
         
-        self.location = EarthLocation.from_geodetic(lla[1], lla[0], lla[2]) # (lon,lat,alt)
+        self.location = create_earth_location(lla)
         
         self.elevation_threshold = 7.5 * units.deg
         self.night_threshold = -12 *units.deg # astro twilight
         if self.mode == GroundSensorModality.OPTICS:
             self._init_optics(scenario.scenario_epoch, scenario.scenario_end)
+            
+        # --------------TASKING LOGIC --------------
+        self.delays = SensorDelays()
+        self.pending_incoming_task_messages = []
 
     def _get_azel(self, time):
         '''time - astropy.time.Time '''
@@ -83,9 +88,23 @@ class GroundSensor:
             orbit = orbit.propagate(time)
         return orbit_to_sky_coord(orbit).transform_to(self._get_azel(time)).alt > self.elevation_threshold
                 
+    def send_tasks_to(self, time, agent_id, sat_key, frozen_state):
+        '''
+            time - astropy.time.Time
+            agent_id - unique string
+            sat_key - unique string
+            frozen_state - StateCatalogEntry
+        '''
+        self.pending_incoming_task_messages.append(PendingTaskMessage(agent_id, sat_key, self.delays.message_delivery_time(time), frozen_state)) 
+         
     
     def tick(self, time):
         '''advance sensor in time - astropy.time.Time'''
         self._update_availability(time) # check for status changes
         #if self.general_status == SensorGeneralStatus.AVAILABLE:
+        
+        
+    
+    def report_out(self):
+        return 
 

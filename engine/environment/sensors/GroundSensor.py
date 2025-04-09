@@ -2,8 +2,8 @@ from astropy.coordinates import AltAz, SkyCoord, get_sun
 from astropy import units 
 from engine.util.astro import orbit_to_sky_coord, create_earth_location
 from engine.environment.sensors.SensorEnums import SensorGeneralStatus, GroundSensorModality
-from engine.environment.sensors.SensorDelays import SensorDelays
-from engine.environment.sensors.SensorMessages import PendingTaskMessage
+
+from engine.environment.sensors.Communication import CommunicationPipeline, SensorResponse
 
 class GroundSensor: 
     def __init__(self,name, lla, mode=GroundSensorModality.RADAR, scenario=None):
@@ -23,8 +23,7 @@ class GroundSensor:
             self._init_optics(scenario.scenario_epoch, scenario.scenario_end)
             
         # --------------TASKING LOGIC --------------
-        self.delays = SensorDelays()
-        self.pending_incoming_task_messages = []
+        self.pipeline = CommunicationPipeline()
 
     def _get_azel(self, time):
         '''time - astropy.time.Time '''
@@ -88,23 +87,37 @@ class GroundSensor:
             orbit = orbit.propagate(time)
         return orbit_to_sky_coord(orbit).transform_to(self._get_azel(time)).alt > self.elevation_threshold
                 
-    def send_tasks_to(self, time, agent_id, sat_key, frozen_state):
+    def pass_to_pipeine(self, time, agent_id, sat_key, frozen_state):
         '''
             time - astropy.time.Time
             agent_id - unique string
             sat_key - unique string
             frozen_state - StateCatalogEntry
         '''
-        self.pending_incoming_task_messages.append(PendingTaskMessage(agent_id, sat_key, self.delays.message_delivery_time(time), frozen_state)) 
+        self.pipeline.receive_task_request( time, agent_id, sat_key, frozen_state)
          
     
     def tick(self, time):
         '''advance sensor in time - astropy.time.Time'''
         self._update_availability(time) # check for status changes
+        
         #if self.general_status == SensorGeneralStatus.AVAILABLE:
         
+        task_messages = self.pipeline.check_for_incoming_tasks(time)
+        
+        # vet task messages
+        if self.general_status == SensorGeneralStatus.AVAILABLE:
+            # sensor online
+            self.pipeline.drop_messages(SensorResponse.DROPPED_SCHEDULING, task_messages, time)
+        else:
+            self.pipeline.drop_messages(SensorResponse.DROPPED_SENSOR_OFFLINE, task_messages, time)
+        
+        # - sensor offline; 
+        
+        # - never visible; 
+        # if visibile send through to try to schedule 
         
     
-    def report_out(self):
-        return 
+    def check_pipeline(self, time):
+        return self.pipeline.check_for_outgoing_messages(time) 
 

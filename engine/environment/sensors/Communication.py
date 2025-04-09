@@ -5,6 +5,7 @@ from enum import Enum
 class SensorResponse(Enum):
     DROPPED_SENSOR_OFFLINE = "DROPPED_SENSOR_OFFLINE",
     DROPPED_SCHEDULING = "DROPPED_SCHEDULING",
+    DROPPED_NOT_VISIBLE = "DROPPED_NOT_VISIBLE"
 
 class CommunicationPipeline:
     def __init__(self):

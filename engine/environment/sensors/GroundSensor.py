@@ -103,18 +103,31 @@ class GroundSensor:
         
         #if self.general_status == SensorGeneralStatus.AVAILABLE:
         
-        task_messages = self.pipeline.check_for_incoming_tasks(time)
+        task_messages_unvetted = self.pipeline.check_for_incoming_tasks(time)
         
         # vet task messages
+        
         if self.general_status == SensorGeneralStatus.AVAILABLE:
             # sensor online
-            self.pipeline.drop_messages(SensorResponse.DROPPED_SCHEDULING, task_messages, time)
+            task_messages_vetted = []
+            task_messages_rejected = []
+            for message in task_messages_unvetted:
+                if self.has_line_of_sight(message.available_state.orbit, time):
+                    task_messages_vetted.append(message)
+                else:
+                    task_messages_rejected.append(message)
+            # reject for visibility
+            self.pipeline.drop_messages(SensorResponse.DROPPED_NOT_VISIBLE, task_messages_unvetted, time)
+            
+            # TODO try to schedule vetted messages
+            #self.pipeline.drop_messages(SensorResponse.DROPPED_SCHEDULING, task_messages_vetted, time)
         else:
-            self.pipeline.drop_messages(SensorResponse.DROPPED_SENSOR_OFFLINE, task_messages, time)
+            # sensor offline; 
+            self.pipeline.drop_messages(SensorResponse.DROPPED_SENSOR_OFFLINE, task_messages_unvetted, time)
         
-        # - sensor offline; 
         
-        # - never visible; 
+        
+         
         # if visibile send through to try to schedule 
         
     

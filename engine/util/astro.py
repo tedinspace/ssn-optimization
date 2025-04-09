@@ -51,7 +51,4 @@ def orbit_to_sky_coord(orbit):
         - SkyCoord: An Astropy SkyCoord object representing the position of the orbit in the GCRS frame.
 
     '''
-    return SkyCoord(x=orbit.r[0], y=orbit.r[1], z=orbit.r[2], 
-                    unit=u.km, 
-                    representation_type='cartesian', 
-                    frame='gcrs')
+    return SkyCoord(x=orbit.r[0], y=orbit.r[1], z=orbit.r[2], unit=u.km, representation_type='cartesian', frame='gcrs')

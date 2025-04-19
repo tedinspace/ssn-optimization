@@ -22,3 +22,4 @@ __pycache__/
 driver1.py
 poliastro-library-vetting.ipynb
 covariance.py
+function-tests.ipynb

@@ -109,10 +109,12 @@ class PendingTaskMessage:
             issue_time (astropy.time.Time): The time the task was issued.
             available_state (StateCatalogEntry): The available state information for the task.
         '''
+        
+        self.available_state = available_state  
+         
         self.agent_id = agent_id
         self.sat_key = sat_key 
         self.issue_time = issue_time
-        self.available_state = available_state   
         self.arrival_time = randomize_message_delivery_time(issue_time)  # Randomized delivery time.
         
 class ResponseMessage:
@@ -126,6 +128,7 @@ class ResponseMessage:
             timestamp (astropy.time.Time): The time the response message was created.
         '''
         self.response_type = response_type
+        
         self.agent_id = original_message.agent_id
         self.sat_key = original_message.sat_key
         self.issue_time = timestamp

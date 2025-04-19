@@ -1,9 +1,9 @@
 from enum import Enum
-
 from astropy.coordinates import AltAz, SkyCoord, get_sun
 from astropy import units 
 from engine.util.astro import orbit_to_sky_coord, create_earth_location
 from engine.environment.sensors.Communication import CommunicationPipeline, SensorResponse
+from engine.environment.sensors.SensorLogic import Operations
 
 class GroundSensorModality(Enum):
     """
@@ -21,11 +21,11 @@ class SensorGeneralStatus(Enum):
     Enum representing the general status of a sensor.
 
     Attributes:
-        AVAILABLE (str): Indicates that the sensor is available (e.g., night for optics).
-        NOT_AVAILABLE (str): Indicates that the sensor is not available (e.g., day for optics).
+        ONLINE (str): Indicates that the sensor is available (e.g., night for optics).
+        OFFLINE (str): Indicates that the sensor is not available (e.g., day for optics).
     """
-    AVAILABLE = "AVAILABLE"  # (night for optics)
-    NOT_AVAILABLE = "NOT_AVAILABLE"  # (day for optics)
+    ONLINE = "ONLINE"  # (night for optics)
+    OFFLINE = "OFFLINE"  # (day for optics)
 
 
 class GroundSensor: 
@@ -34,7 +34,7 @@ class GroundSensor:
         self.name = name
         self.mode = mode
                
-        self.general_status = SensorGeneralStatus.AVAILABLE 
+        self.general_status = SensorGeneralStatus.ONLINE 
         self.availability_trans_times = []
         self.availability_trans_to_status = []
         
@@ -44,6 +44,8 @@ class GroundSensor:
         self.night_threshold = -12 *units.deg # astro twilight
         if self.mode == GroundSensorModality.OPTICS:
             self._init_optics(scenario.scenario_epoch, scenario.scenario_end)
+            
+        self.operator = Operations(self.mode)
             
         # --------------TASKING LOGIC --------------
         self.pipeline = CommunicationPipeline()
@@ -66,7 +68,7 @@ class GroundSensor:
         end_time - astropy.time.Time
         rate - rate + accuracy 
         '''
-        self.general_status = SensorGeneralStatus.AVAILABLE if self._is_night(start_time) else SensorGeneralStatus.NOT_AVAILABLE
+        self.general_status = SensorGeneralStatus.ONLINE if self._is_night(start_time) else SensorGeneralStatus.OFFLINE
 
         day_night_transition_times = []
         day_night_transition_status = []
@@ -75,11 +77,11 @@ class GroundSensor:
         current_time = start_time.copy()+rate # move ahead one timestep
         
         while current_time < end_time:
-            curr_status = SensorGeneralStatus.AVAILABLE if self._is_night(current_time) else SensorGeneralStatus.NOT_AVAILABLE
+            curr_status = SensorGeneralStatus.ONLINE if self._is_night(current_time) else SensorGeneralStatus.OFFLINE
             if curr_status!=prev_status:
                 day_night_transition_status.append(curr_status) # becomes this status
                 # conservative time cutoffs 
-                if current_time == SensorGeneralStatus.NOT_AVAILABLE:
+                if current_time == SensorGeneralStatus.OFFLINE:
                     day_night_transition_times.append(current_time-rate) 
                 else:
                     day_night_transition_times.append(current_time)
@@ -130,7 +132,7 @@ class GroundSensor:
         
         # vet task messages
         
-        if self.general_status == SensorGeneralStatus.AVAILABLE:
+        if self.general_status == SensorGeneralStatus.ONLINE:
             # sensor online
             task_messages_vetted = []
             task_messages_rejected = []
@@ -143,6 +145,7 @@ class GroundSensor:
             self.pipeline.drop_messages(SensorResponse.DROPPED_NOT_VISIBLE, task_messages_unvetted, time)
             
             # TODO try to schedule vetted messages
+            self.operator.tick(time,task_messages_vetted )
             # TODO no scheduling if sensor is scheduled to be offline 
             
             #self.pipeline.drop_messages(SensorResponse.DROPPED_SCHEDULING, task_messages_vetted, time)

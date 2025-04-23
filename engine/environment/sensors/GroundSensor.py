@@ -32,6 +32,7 @@ class GroundSensor:
     def __init__(self,name, lla, mode=GroundSensorModality.RADAR, scenario=None):
         '''scenario required for optics'''
         self.name = name
+        self.sensor_key = name
         self.mode = mode
                
         self.general_status = SensorGeneralStatus.ONLINE 
@@ -48,7 +49,7 @@ class GroundSensor:
         self.operator = Operations(self.mode)
             
         # --------------TASKING LOGIC --------------
-        self.pipeline = CommunicationPipeline()
+        self.pipeline = CommunicationPipeline(self.sensor_key)
 
     def _get_azel(self, time):
         '''time - astropy.time.Time '''
@@ -97,11 +98,35 @@ class GroundSensor:
         if self.availability_trans_times:
             # at some point availability status will change
             
-            if time >= self.availability_trans_times[0]:        
+            if time >= self.availability_trans_times[0]:     
+                print(self.availability_trans_times)   
                 self.general_status = self.availability_trans_to_status[0] 
                 # remove from transition array
                 self.availability_trans_times = self.availability_trans_times[1:]
                 self.availability_trans_to_status = self.availability_trans_to_status[1:]
+                
+                # if we are going offline
+                if self.general_status == SensorGeneralStatus.OFFLINE:
+                    print('off')
+                    print(self.operator.active_task)
+                    print(len(self.operator.scheduled_tasks))
+                    # > drop active task
+                    if self.operator.active_task !=None:
+                        self.pipeline.drop_message(SensorResponse.DROPPED_SCHEDULING, self.operator.active_task.task_request, time)
+                        self.operator.active_task = None
+                    # > drop scheduled tasks
+                    if len(self.operator.scheduled_tasks)!=0:
+                   
+                        for task in self.operator.scheduled_tasks:
+                            self.pipeline.drop_message(SensorResponse.DROPPED_SCHEDULING, task.task_request, time)
+                        
+                        self.operator.scheduled_tasks = []
+                else:
+                    print('on')
+                    print(self.operator.active_task)
+                    print(len(self.operator.scheduled_tasks))
+                        
+                    
      
     def has_line_of_sight(self, orbit, time):
         ''' 
@@ -122,16 +147,13 @@ class GroundSensor:
         self.pipeline.receive_task_request( time, agent_id, sat_key, frozen_state)
          
     
-    def tick(self, time):
+    def tick(self, time, satellite_truth_map):
         '''advance sensor in time - astropy.time.Time'''
         self._update_availability(time) # check for status changes
-        
-        #if self.general_status == SensorGeneralStatus.AVAILABLE:
-        
+                
         task_messages_unvetted = self.pipeline.check_for_incoming_tasks(time)
         
         # vet task messages
-        
         if self.general_status == SensorGeneralStatus.ONLINE:
             # sensor online
             task_messages_vetted = []
@@ -145,10 +167,13 @@ class GroundSensor:
             self.pipeline.drop_messages(SensorResponse.DROPPED_NOT_VISIBLE, task_messages_unvetted, time)
             
             # TODO try to schedule vetted messages
-            self.operator.tick(time,task_messages_vetted )
             # TODO no scheduling if sensor is scheduled to be offline 
-            
-            #self.pipeline.drop_messages(SensorResponse.DROPPED_SCHEDULING, task_messages_vetted, time)
+            unschedulable_task_requests, completed_task = self.operator.tick(time,task_messages_vetted, satellite_truth_map )
+            if unschedulable_task_requests:
+                self.pipeline.drop_messages(SensorResponse.DROPPED_SCHEDULING, unschedulable_task_requests, time)
+            if completed_task!=None:
+                self.pipeline.send_state_updated(completed_task, time)
+                
         else:
             # sensor offline; 
             self.pipeline.drop_messages(SensorResponse.DROPPED_SENSOR_OFFLINE, task_messages_unvetted, time)

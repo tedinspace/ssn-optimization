@@ -5,14 +5,17 @@ from enum import Enum
 class SensorResponse(Enum):
     DROPPED_SENSOR_OFFLINE = "DROPPED_SENSOR_OFFLINE",  # Dropped due to sensor being offline.
     DROPPED_SCHEDULING = "DROPPED_SCHEDULING",  # Dropped due to scheduling issues.
-    DROPPED_NOT_VISIBLE = "DROPPED_NOT_VISIBLE"  # Dropped due to the sensor not being visible.
+    DROPPED_NOT_VISIBLE = "DROPPED_NOT_VISIBLE",  # Dropped due to the sensor not being visible.
+    CATALOG_STATE_UPDATE = "CATALOG_STATE_UPDATE" # TODO (different type for maneuver?)
+    
 
 
 class CommunicationPipeline:
-    def __init__(self):
+    def __init__(self, sensor_key):
         ''' 
         Initializes the CommunicationPipeline 
         '''
+        self.sensor_key = sensor_key
         self.pending_incoming_task_messages = [] 
         self.pending_outgoing_messages = [] 
         
@@ -26,7 +29,7 @@ class CommunicationPipeline:
             sat_key (str): Key associated with the satellite.
             frozen_state (StateCatalogEntry): The state entry of the satellite at the time of the request.
         '''
-        self.pending_incoming_task_messages.append(PendingTaskMessage(agent_id, sat_key, time, frozen_state)) 
+        self.pending_incoming_task_messages.append(PendingTaskMessage(agent_id, sat_key,self.sensor_key, time, frozen_state)) 
         
     def check_for_incoming_tasks(self, time):
         ''' 
@@ -72,6 +75,9 @@ class CommunicationPipeline:
             time (astropy.time.Time): The current time to record in the response message.
         '''
         self.pending_outgoing_messages.append(ResponseMessage(reason, task_message, time)) 
+    
+    def send_state_updated(self, task_record, time):
+         self.pending_outgoing_messages.append(ResponseMessage(SensorResponse.CATALOG_STATE_UPDATE, task_record.task_request, time, task_record)) # TODO (different type for maneuver?)
         
     def check_for_outgoing_messages(self, time):
         ''' 
@@ -99,7 +105,7 @@ class CommunicationPipeline:
 #                                           MESSAGES
 # -----------------------------------------------------------------------------------------
 class PendingTaskMessage:
-    def __init__(self, agent_id, sat_key, issue_time, available_state):
+    def __init__(self, agent_id, sat_key, sensor_key, issue_time, available_state):
         ''' 
         Initializes a PendingTaskMessage with the provided parameters.
         
@@ -111,14 +117,14 @@ class PendingTaskMessage:
         '''
         
         self.available_state = available_state  
-         
+        self.sensor_key = sensor_key
         self.agent_id = agent_id
         self.sat_key = sat_key 
         self.issue_time = issue_time
         self.arrival_time = randomize_message_delivery_time(issue_time)  # Randomized delivery time.
         
 class ResponseMessage:
-    def __init__(self, response_type, original_message, timestamp):
+    def __init__(self, response_type, original_message, timestamp, state_update=None):
         ''' 
         Initializes a ResponseMessage with the response type and information from the original message.
         
@@ -147,4 +153,4 @@ def randomize_message_delivery_time(issue_time):
     Returns:
         astropy.time.Time: A new time with a random delay added.
     '''
-    return issue_time + (5 + random.uniform(-2.5, 2.5)) * 60 * units.s  # Delay between -2.5 to 2.5 minutes.
+    return issue_time +  random.uniform(2.5, 7.5) * 60 * units.s   # Delay between 2.5 to 7.5 [mins].

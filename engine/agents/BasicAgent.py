@@ -7,7 +7,7 @@ class BasicAgent:
         self.agent_id = agent_id
         self.n_assigned_sensors = len(assigned_sensors)
         self.n_assigned_satellites = len(assigned_satellites)
-        self.action_space_size = self.n_assigned_sensors*self.n_assigned_sensors + 1
+        self.action_space_size = self.n_assigned_sensors*self.n_assigned_satellites + 1
         
         self.assigned_sensors = assigned_sensors
         self.assigned_satellites = assigned_satellites

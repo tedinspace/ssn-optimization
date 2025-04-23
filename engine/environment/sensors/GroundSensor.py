@@ -1,7 +1,7 @@
 from enum import Enum
-from astropy.coordinates import AltAz, SkyCoord, get_sun
+from astropy.coordinates import AltAz,CartesianRepresentation, GCRS, SkyCoord, get_sun
 from astropy import units 
-from engine.util.astro import orbit_to_sky_coord, create_earth_location, orbit_to_radec
+from engine.util.astro import create_earth_location
 from engine.environment.sensors.Communication import CommunicationPipeline, SensorResponse
 from engine.environment.sensors.SensorLogic import Operations
 
@@ -56,9 +56,8 @@ class GroundSensor:
         return AltAz(obstime=time, location=self.location)
     
     def _sun_at_sensor(self, time):
-        altaz_frame = self._get_azel(time)
         sun = get_sun(time)
-        return  SkyCoord(ra=sun.ra, dec=sun.dec).transform_to(altaz_frame)
+        return  SkyCoord(ra=sun.ra, dec=sun.dec).transform_to(self._get_azel(time))
     def _is_night(self,time):
         '''is it night at sensor given time - astropy.time.Time '''
         return self._sun_at_sensor(time).alt < self.night_threshold
@@ -135,11 +134,9 @@ class GroundSensor:
         '''
         if orbit.epoch.mjd != time.mjd:
             orbit = orbit.propagate(time)
-        radec = orbit_to_radec(orbit)
-        altaz_frame = self._get_azel(time)
-        print(SkyCoord(ra=radec.ra, dec=radec.dec).transform_to(altaz_frame).alt)
+        #print(SkyCoord(ra=radec.ra, dec=radec.dec).transform_to(altaz_frame).alt)
         #return orbit_to_sky_coord(orbit).transform_to(self._get_azel(time)).alt > self.elevation_threshold
-        return  SkyCoord(ra=radec.ra, dec=radec.dec).transform_to(altaz_frame).alt > self.elevation_threshold
+        return   GCRS( CartesianRepresentation(orbit.r << units.km), obstime=orbit.epoch).transform_to(self._get_azel(time)).alt > self.elevation_threshold
         
         
                 
@@ -167,10 +164,8 @@ class GroundSensor:
             task_messages_rejected = []
             for message in task_messages_unvetted:
                 if self.has_line_of_sight(message.available_state.orbit, time)and self.has_line_of_sight(message.available_state.orbit, time+self.operator.schedule_ahead_limit_s):
-                    print("Y: "+self.sensor_key+"-->"+message.sat_key)
                     task_messages_vetted.append(message)
                 else:
-                    print("N: "+self.sensor_key+"-->"+message.sat_key)
                     task_messages_rejected.append(message)
             # reject for visibility
             self.pipeline.drop_messages(SensorResponse.DROPPED_NOT_VISIBLE, task_messages_unvetted, time)

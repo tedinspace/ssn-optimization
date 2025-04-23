@@ -10,30 +10,31 @@ from engine.builder.sensors.ssn import load_sensor_map
 from engine.util.time import  DEFAULT_SCENARIO_EPOCH
 
 class Environment: 
-    def __init__(self, sensor_keys, sat_keys, scenario_configs=Scenario(DEFAULT_SCENARIO_EPOCH, 24.0)):
+    def __init__(self, sensor_keys, sat_keys):
         ''''''
+        
+        self.scenario_configs=Scenario(DEFAULT_SCENARIO_EPOCH, 24.0)
+        
         self.sensor_keys = sensor_keys
         self.sat_keys = sat_keys
         
-        self.scenario_configs = scenario_configs
-
+    
+    def reset(self):
+        ''''''
         self.satellite_truth = {}
-        for i, key in enumerate(sat_keys):
+        for i, key in enumerate(self.sat_keys):
             self.satellite_truth[key] = SatelliteTruth(key, TLE_LIBRARY[key][1], TLE_LIBRARY[key][2], self.scenario_configs, 13.3)
         
-        self.satellite_truth[sat_keys[1]].add_maneuvers([ManeuverDetails(10, 1.5, self.scenario_configs), ManeuverDetails(15.3, 4.15, self.scenario_configs)])
+        self.satellite_truth[self.sat_keys[1]].add_maneuvers([ManeuverDetails(10, 1.5, self.scenario_configs), ManeuverDetails(15.3, 4.15, self.scenario_configs)])
         self.state_catalog = StateCatalog(self.satellite_truth)
         
-        self.sensors =  load_sensor_map(sensor_keys, self.scenario_configs)
-
+        self.sensors =  load_sensor_map(self.sensor_keys, self.scenario_configs)
+        
         self.tracker = EventTracker() 
         self.tracker.record_scenario(self.satellite_truth, self.sensors)
         
         self.t = self.scenario_configs.scenario_epoch.copy()
-    
-    def reset(self):
-        ''''''
-        # TODO
+        
         return self.t, self.state_catalog, False
         
     def step(self, actions):

@@ -31,7 +31,7 @@ class Environment:
         self.sensors =  load_sensor_map(self.sensor_keys, self.scenario_configs)
         
         self.tracker = EventTracker() 
-        self.tracker.record_scenario(self.satellite_truth, self.sensors)
+        self.tracker.record_scenario(self.satellite_truth, self.sensors, self.scenario_configs)
         
         self.t = self.scenario_configs.scenario_epoch.copy()
         

@@ -18,15 +18,18 @@ class EventTracker:
         self.sat_keys = set()
         self.sensor_keys = set()
         
+        self.scenario_configs = None
         
         
-    def record_scenario(self,sat_truth, sensor_truth):
+        
+    def record_scenario(self,sat_truth, sensor_truth, scenario_configs):
         for sat_key in sat_truth:
             self.sat_keys.add(sat_key)
             self.maneuver_truth_record[sat_key]=sat_truth[sat_key].maneuvers
         for sensor_key in sensor_truth:
             self.sensor_keys.add(sensor_key)
             self.sensor_availability[sensor_key]= [sensor_truth[sensor_key].availability_trans_to_status , sensor_truth[sensor_key].availability_trans_times]
+        self.scenario_configs = scenario_configs
                   
          
     def record_tasking_interval(self,state_update_response):

@@ -18,10 +18,6 @@ def basic_ground_sensor_plot_v1(loaded_tracker):
 
     fig, ax = plt.subplots(figsize=(12, 6))
     
-    dummy_start = 60000  # or some reasonable MJD value
-    dummy_width = 1e-6  # very small bar
-
-    
     
     if loaded_tracker.tasking_record:
         for sensor_idx, sensor_key in enumerate(sensor_names):
@@ -36,15 +32,16 @@ def basic_ground_sensor_plot_v1(loaded_tracker):
                         facecolors=color
                     )
     else:
-        for sensor_idx, sensor_key in enumerate(sensor_names):
+        start = loaded_tracker.scenario_configs.scenario_epoch.mjd
+        end = loaded_tracker.scenario_configs.scenario_end.mjd
+        for sensor_idx, sensor_key in  enumerate(sensor_names):
             ax.broken_barh(
-                [(dummy_start, dummy_width)], 
-                (sensor_idx - 0.4, 0.8),
-                facecolors='none',  # make it invisible
-                edgecolors='lightgray',  # optional thin edge to show row
-                linewidth=0.5,
-                alpha=0.5
-            )
+                            [(start, end - start)],
+                            (sensor_idx - 0.4, 0.8),
+                            facecolors="white"
+                        )
+    
+
 
     
 

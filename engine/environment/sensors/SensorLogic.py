@@ -46,6 +46,9 @@ class Operations:
                 if len(maneuvers_to_estimate)> 0 or len(maneuvers_to_estimate_while_tasking)>0:
                     # note maneuvers were detected 
                     self.active_task.maneuvers_detected = True
+                # TODO handle maneuvers during case    
+                self.active_task.orbit = active_satellite_truth.orbit.propagate(self.active_task.scheduled_end)
+                self.active_task.orbit_validity_time = self.active_task.scheduled_end
                 
                 
             # Question 3: what will happen to the state estimation (if maneuvered, maneuvering, or not)
@@ -122,6 +125,8 @@ class TaskRecord:
         self.tasking_completed = False
         self.able_to_acquire = None
         self.maneuvers_detected = False
+        self.orbit = None
+        self.orbit_validity_time = None
         
         
         

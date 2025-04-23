@@ -3,9 +3,7 @@ from enum import Enum
 
 class Event(Enum):
     TASKING_ISSUED = "TASKING_ISSUED", 
-    TASKING_DROPPED_SCHEDULING = "TASKING_DROPPED_SCHEDULING", # <-- reasonable 
-    TASKING_DROPPED_SENSOR_OFFLINE = "TASKING_DROPPED_SENSOR_OFFLINE" , # <-- less reasonable / shouldn't happen
-    TASKING_DROPPED_VISIBILITY = "TASKING_DROPPED_INVALID_VISIBILITY", # <-- shouldn't happen
+    STATE_UPDATE = "STATE_UPDATE", 
     
     
 class EventTracker:

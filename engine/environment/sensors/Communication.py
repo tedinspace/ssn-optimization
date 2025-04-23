@@ -129,7 +129,7 @@ class PendingTaskMessage:
         self.arrival_time = randomize_message_delivery_time(issue_time)  # Randomized delivery time.
         
 class ResponseMessage:
-    def __init__(self, response_type, original_message, timestamp, state_update=None):
+    def __init__(self, response_type, original_message, timestamp, record=None):
         ''' 
         Initializes a ResponseMessage with the response type and information from the original message.
         
@@ -144,6 +144,7 @@ class ResponseMessage:
         self.sat_key = original_message.sat_key
         self.issue_time = timestamp
         self.arrival_time = randomize_message_delivery_time(timestamp)  # Randomized delivery time for the response.
+        self.record = record
 
 # -----------------------------------------------------------------------------------------
 #                                          FUNCTIONS

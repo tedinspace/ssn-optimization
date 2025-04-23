@@ -50,7 +50,7 @@ class Operations:
                 if len(maneuvers_to_estimate)> 0 or len(maneuvers_to_estimate_while_tasking)>0:
                     # note maneuvers were detected 
                     self.active_task.maneuvers_detected = True
-                # TODO handle maneuvers during case
+                #  handle maneuvers during case
                 if len(maneuvers_to_estimate_while_tasking) > 0:
                     tmp_orbit = active_satellite_truth.orbit
                     for m in maneuvers_to_estimate:

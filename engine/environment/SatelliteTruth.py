@@ -5,6 +5,7 @@ from astropy import units
 from poliastro.maneuver import Maneuver
 from engine.util.time import HPD
 from engine.util.astro import tle_to_orbit
+import uuid
 
 class SatelliteTruth:
     def __init__(self, name, l1, l2, scenario_configs, reepoch_hours=None):
@@ -139,3 +140,4 @@ class ManeuverDetails:
         self.maneuver = self.dir * magnitude_dv  # Scale the direction by magnitude_dv
         self.time = scenario_configs.scenario_epoch + hours_into_scenario * units.h  # Calculate the maneuver time
         self.occurred = False  # The maneuver has not yet occurred
+        self.id = uuid.uuid4()

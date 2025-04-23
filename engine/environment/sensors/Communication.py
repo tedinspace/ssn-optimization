@@ -142,6 +142,7 @@ class ResponseMessage:
         
         self.agent_id = original_message.agent_id
         self.sat_key = original_message.sat_key
+        self.sensor_key = original_message.sensor_key
         self.issue_time = timestamp
         self.arrival_time = randomize_message_delivery_time(timestamp)  # Randomized delivery time for the response.
         self.record = record

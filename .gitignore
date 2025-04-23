@@ -18,8 +18,11 @@ __pycache__/
 .DS_Store
 **/.DS_Store
 
-# staged files
+# staged files 
 driver1.py
 poliastro-library-vetting.ipynb
 covariance.py
 function-tests.ipynb
+create-visuals.ipynb
+
+*.pkl

@@ -1,9 +1,12 @@
 import random
 from astropy import units
+from poliastro.maneuver import Maneuver
 
 class Operations:
     
     def __init__(self, parent_sensor):
+        '''
+        '''
         self.parent_sensor = parent_sensor
         self.active_task = None
         self.scheduled_tasks = []
@@ -42,18 +45,27 @@ class Operations:
                     if future_maneuver.time > self.active_task.scheduled_start and future_maneuver.time < self.active_task.scheduled_end:
                         print("[ALERT] OCCURS DURING THE TASKING")
                         maneuvers_to_estimate_while_tasking.append(future_maneuver)
+                
                 #print(len(maneuvers_to_estimate_while_tasking))        
                 if len(maneuvers_to_estimate)> 0 or len(maneuvers_to_estimate_while_tasking)>0:
                     # note maneuvers were detected 
                     self.active_task.maneuvers_detected = True
-                # TODO handle maneuvers during case    
-                self.active_task.orbit = active_satellite_truth.orbit.propagate(self.active_task.scheduled_end)
+                # TODO handle maneuvers during case
+                if len(maneuvers_to_estimate_while_tasking) > 0:
+                    tmp_orbit = active_satellite_truth.orbit
+                    for m in maneuvers_to_estimate:
+                        tmp_orbit = tmp_orbit.propagate(m.time).apply_maneuver(Maneuver.impulse(m.maneuver << (units.m / units.s)))
+                    self.active_task.orbit = tmp_orbit
+                else:    
+                    self.active_task.orbit = active_satellite_truth.orbit.propagate(self.active_task.scheduled_end)
                 self.active_task.orbit_validity_time = self.active_task.scheduled_end
                 
                 
             # Question 3: what will happen to the state estimation (if maneuvered, maneuvering, or not)
     
     def tick(self, time, incoming_valid_task_messages, satellite_truth_map):
+        '''
+        '''
         completed_task = None
         if self.active_task:
             
@@ -86,7 +98,6 @@ class Operations:
                 # A. nothing on the queue
                 requestedStartTime =  randomize_slew_time(time) 
                 
-                
                 if self.active_task.task_request.sat_key != task_req.sat_key: # TODO available at request time
                     # not the active task AND TODO valid time
                     
@@ -107,11 +118,9 @@ class Operations:
                     
         return unschedulable_task_request, completed_task
 
-                
-        
-        
-            
-
+# -----------------------------------------------------------------------------------------
+#                                          TaskRecord
+# -----------------------------------------------------------------------------------------
 class TaskRecord:
     def __init__(self,start_time, task_request):
         '''
@@ -127,15 +136,11 @@ class TaskRecord:
         self.maneuvers_detected = False
         self.orbit = None
         self.orbit_validity_time = None
-        
-        
-        
+   
+          
 # -----------------------------------------------------------------------------------------
 #                                          FUNCTIONS
 # -----------------------------------------------------------------------------------------
 def randomize_slew_time(base_time):
     '''base_time (astropy.time.Time)'''
     return base_time +  random.uniform(1.5, 3.5) * 60 * units.s  
-
-
-

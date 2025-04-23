@@ -13,6 +13,10 @@ def mhr():
     '''
     return SensorInfo('mhr', [42.61762, -71.49038, 0], GroundSensorModality.RADAR)
 
+def boston():
+
+    return SensorInfo('boston', [42.61762, -71.49038, 0], GroundSensorModality.RADAR)
+
 def ascension():
     '''
     Returns a SensorInfo object for the Ascension sensor location.
@@ -69,6 +73,7 @@ def ssn():
     '''
     return {
         'mhr': mhr(), 
+        'boston': boston(), # mhr clone 
         'ascension': ascension(), 
         'holt': holt(), 
         'sst': sst(), 

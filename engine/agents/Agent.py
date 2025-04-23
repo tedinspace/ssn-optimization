@@ -1,9 +1,7 @@
-
 import random
 
-class BasicAgent:
-    
-    def __init__(self, agent_id, assigned_sensors, assigned_satellites ):
+class Agent:
+    def __init__(self, agent_id, assigned_sensors,assigned_satellites ):
         self.agent_id = agent_id
         self.n_assigned_sensors = len(assigned_sensors)
         self.n_assigned_satellites = len(assigned_satellites)
@@ -12,15 +10,21 @@ class BasicAgent:
         self.assigned_sensors = assigned_sensors
         self.assigned_satellites = assigned_satellites
         
-        self.action_map = [None] # do nothing is index zero
-        
+        # 0: do nothing, otherwise (sensor,sat) 
+        self.action_encoding = [None] 
         for sensor in self.assigned_sensors:
             for sat in self.assigned_satellites:
-                self.action_map.append((sensor,sat))
+                self.action_encoding.append((sensor,sat))
                 
-    def decide(self):
-        return self.action_map[random.randint(0, self.action_space_size-1)]
-        
+    def act_randomly(self):
+        return self.action_encoding[random.randint(0, self.action_space_size-1)]
+    
+    def do_nothing(self):
+        return self.action_encoding[0]
+    
+    def reset(self):
+        # TODO
+        return
         
         
         

@@ -9,34 +9,48 @@ def basic_ground_sensor_plot_v1(loaded_tracker):
             2. maneuver times (colored by object)
             3. online/offline times
     '''
-    sensor_names = list(loaded_tracker.tasking_record.keys())
+    sensor_names = list(loaded_tracker.sensor_keys)
 
-    sat_keys = set( 
-        sat_key
-        for sensor in loaded_tracker.tasking_record.values()
-        for sat_key in sensor
-    )
-    sensor_keys = list(loaded_tracker.tasking_record.keys())
+    sat_keys = loaded_tracker.sat_keys
+    sensor_keys = list(loaded_tracker.sensor_keys)
 
     color_map = {key: f"C{idx % 10}" for idx, key in enumerate(sat_keys)}
 
     fig, ax = plt.subplots(figsize=(12, 6))
-    for sensor_idx, sensor_key in enumerate(sensor_names):
-        for sat_key in loaded_tracker.tasking_record[sensor_key]:
-            color = color_map[sat_key]
-            for message in loaded_tracker.tasking_record[sensor_key][sat_key]:
-                start = message.record.scheduled_start.mjd
-                end = message.record.scheduled_end.mjd
-                ax.broken_barh(
-                    [(start, end - start)],
-                    (sensor_idx - 0.4, 0.8),
-                    facecolors=color
-                )
+    
+    dummy_start = 60000  # or some reasonable MJD value
+    dummy_width = 1e-6  # very small bar
+
+    
+    
+    if loaded_tracker.tasking_record:
+        for sensor_idx, sensor_key in enumerate(sensor_names):
+            for sat_key in loaded_tracker.tasking_record[sensor_key]:
+                color = color_map[sat_key]
+                for message in loaded_tracker.tasking_record[sensor_key][sat_key]:
+                    start = message.record.scheduled_start.mjd
+                    end = message.record.scheduled_end.mjd
+                    ax.broken_barh(
+                        [(start, end - start)],
+                        (sensor_idx - 0.4, 0.8),
+                        facecolors=color
+                    )
+    else:
+        for sensor_idx, sensor_key in enumerate(sensor_names):
+            ax.broken_barh(
+                [(dummy_start, dummy_width)], 
+                (sensor_idx - 0.4, 0.8),
+                facecolors='none',  # make it invisible
+                edgecolors='lightgray',  # optional thin edge to show row
+                linewidth=0.5,
+                alpha=0.5
+            )
+
+    
 
     ax.set_yticks(range(len(sensor_names)))
     ax.set_yticklabels(sensor_names)
-    ax.set_yticks(range(len(sensor_keys)))
-    ax.set_yticklabels(sensor_keys)
+
     ax.set_xlabel("MJD Time")
     ax.set_ylabel("Sensors")
     ax.set_title("Sensor Tasking Schedule")
@@ -45,11 +59,13 @@ def basic_ground_sensor_plot_v1(loaded_tracker):
     for sat_k in loaded_tracker.maneuver_truth_record:
         maneuvers = loaded_tracker.maneuver_truth_record[sat_k]
         for m in maneuvers:
+            print(m.time)
             ax.axvline(x=m.time.mjd, color=color_map[sat_k], linestyle='--', linewidth=1)
 
     for sensor_k in loaded_tracker.sensor_availability:
         type_and_times = loaded_tracker.sensor_availability[sensor_k]
         for i in range(len(type_and_times[0])):
+            print(type_and_times[1][i].mjd)
             color = 'green'
             if type_and_times[0][i]==SensorGeneralStatus.OFFLINE:
                 color = 'red'
@@ -62,7 +78,6 @@ def basic_ground_sensor_plot_v1(loaded_tracker):
             fontsize=9,
             color=color,
         )
-            
         
     # Legend
     legend_patches = [mpatches.Patch(color=color_map[k], label=str(k)) for k in color_map]

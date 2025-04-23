@@ -1,6 +1,6 @@
 
 from engine.environment.Environment import Environment
-from engine.agents.BasicAgent import BasicAgent
+from engine.agents.Trivial import RandomAgent
 from engine.util.plots import basic_ground_sensor_plot_v1
 
 
@@ -8,7 +8,7 @@ sat_keys = ["AEHF 1","AEHF 2","AEHF 3", "AEHF 4"]
 sensor_keys = ['mhr', 'socorro', 'boston']
 
 
-Agents = [BasicAgent("test agent",sensor_keys, sat_keys )]
+Agents = [RandomAgent("test agent",sensor_keys, sat_keys )]
 
 env = Environment(sensor_keys, sat_keys)
 

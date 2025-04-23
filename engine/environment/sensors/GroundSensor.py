@@ -46,7 +46,7 @@ class GroundSensor:
         if self.mode == GroundSensorModality.OPTICS:
             self._init_optics(scenario.scenario_epoch, scenario.scenario_end)
             
-        self.operator = Operations(self.mode)
+        self.operator = Operations(self)
             
         # --------------TASKING LOGIC --------------
         self.pipeline = CommunicationPipeline(self.sensor_key)
@@ -99,7 +99,6 @@ class GroundSensor:
             # at some point availability status will change
             
             if time >= self.availability_trans_times[0]:     
-                print(self.availability_trans_times)   
                 self.general_status = self.availability_trans_to_status[0] 
                 # remove from transition array
                 self.availability_trans_times = self.availability_trans_times[1:]
@@ -159,7 +158,7 @@ class GroundSensor:
             task_messages_vetted = []
             task_messages_rejected = []
             for message in task_messages_unvetted:
-                if self.has_line_of_sight(message.available_state.orbit, time):
+                if self.has_line_of_sight(message.available_state.orbit, time)and self.has_line_of_sight(message.available_state.orbit, time+self.operator.schedule_ahead_limit_s):
                     task_messages_vetted.append(message)
                 else:
                     task_messages_rejected.append(message)
@@ -172,17 +171,15 @@ class GroundSensor:
             if unschedulable_task_requests:
                 self.pipeline.drop_messages(SensorResponse.DROPPED_SCHEDULING, unschedulable_task_requests, time)
             if completed_task!=None:
-                self.pipeline.send_state_updated(completed_task, time)
+                if completed_task.able_to_acquire == True:
+                    self.pipeline.send_state_updated(completed_task, time)
+                else:
+                    self.pipeline.drop_message(SensorResponse.FAILURE_OBJECT_LOST, completed_task.task_request, time)             
                 
         else:
             # sensor offline; 
             self.pipeline.drop_messages(SensorResponse.DROPPED_SENSOR_OFFLINE, task_messages_unvetted, time)
-        
-        
-        
-         
-        # if visibile send through to try to schedule 
-        
+                
     
     def check_pipeline(self, time):
         return self.pipeline.check_for_outgoing_messages(time) 

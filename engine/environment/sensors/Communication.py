@@ -6,7 +6,9 @@ class SensorResponse(Enum):
     DROPPED_SENSOR_OFFLINE = "DROPPED_SENSOR_OFFLINE",  # Dropped due to sensor being offline.
     DROPPED_SCHEDULING = "DROPPED_SCHEDULING",  # Dropped due to scheduling issues.
     DROPPED_NOT_VISIBLE = "DROPPED_NOT_VISIBLE",  # Dropped due to the sensor not being visible.
-    CATALOG_STATE_UPDATE = "CATALOG_STATE_UPDATE" # TODO (different type for maneuver?)
+    FAILURE_OBJECT_LOST = "FAILURE_OBJECT_LOST",
+    CATALOG_STATE_UPDATE_NOMINAL = "CATALOG_STATE_UPDATE_NOMINAL", 
+    CATALOG_STATE_UPDATE_MANEUVER = "CATALOG_STATE_UPDATE_MANEUVER"
     
 
 
@@ -77,7 +79,10 @@ class CommunicationPipeline:
         self.pending_outgoing_messages.append(ResponseMessage(reason, task_message, time)) 
     
     def send_state_updated(self, task_record, time):
-         self.pending_outgoing_messages.append(ResponseMessage(SensorResponse.CATALOG_STATE_UPDATE, task_record.task_request, time, task_record)) # TODO (different type for maneuver?)
+        if task_record.maneuvers_detected:
+            self.pending_outgoing_messages.append(ResponseMessage(SensorResponse.CATALOG_STATE_UPDATE_MANEUVER, task_record.task_request, time, task_record)) 
+        else: 
+            self.pending_outgoing_messages.append(ResponseMessage(SensorResponse.CATALOG_STATE_UPDATE_NOMINAL, task_record.task_request, time, task_record)) 
         
     def check_for_outgoing_messages(self, time):
         ''' 

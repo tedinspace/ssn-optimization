@@ -1,6 +1,6 @@
 from sgp4.api import Satrec
 from astropy import units as u
-from astropy.coordinates import CartesianRepresentation, TEME, GCRS, SkyCoord, EarthLocation
+from astropy.coordinates import CartesianRepresentation, TEME, GCRS, SkyCoord, EarthLocation, ICRS
 from astropy.time import Time
 from astropy.units.quantity import Quantity
 from poliastro.twobody import Orbit
@@ -52,6 +52,9 @@ def orbit_to_sky_coord(orbit):
 
     '''
     return SkyCoord(x=orbit.r[0], y=orbit.r[1], z=orbit.r[2], unit=u.km, representation_type='cartesian', frame='gcrs')
+
+def orbit_to_radec(orbit):
+    return GCRS( CartesianRepresentation(orbit.r << u.km), obstime=orbit.epoch).transform_to(ICRS())
 
 def create_earth_location(lat_lon_alt):
     return EarthLocation.from_geodetic(lat_lon_alt[1], lat_lon_alt[0], lat_lon_alt[2]) 

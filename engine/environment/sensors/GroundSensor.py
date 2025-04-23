@@ -1,7 +1,7 @@
 from enum import Enum
 from astropy.coordinates import AltAz, SkyCoord, get_sun
 from astropy import units 
-from engine.util.astro import orbit_to_sky_coord, create_earth_location
+from engine.util.astro import orbit_to_sky_coord, create_earth_location, orbit_to_radec
 from engine.environment.sensors.Communication import CommunicationPipeline, SensorResponse
 from engine.environment.sensors.SensorLogic import Operations
 
@@ -41,7 +41,7 @@ class GroundSensor:
         
         self.location = create_earth_location(lla)
         
-        self.elevation_threshold = 7.5 * units.deg
+        self.elevation_threshold = 4.5 * units.deg
         self.night_threshold = -12 *units.deg # astro twilight
         if self.mode == GroundSensorModality.OPTICS:
             self._init_optics(scenario.scenario_epoch, scenario.scenario_end)
@@ -99,6 +99,7 @@ class GroundSensor:
             # at some point availability status will change
             
             if time >= self.availability_trans_times[0]:     
+                
                 self.general_status = self.availability_trans_to_status[0] 
                 # remove from transition array
                 self.availability_trans_times = self.availability_trans_times[1:]
@@ -134,7 +135,13 @@ class GroundSensor:
         '''
         if orbit.epoch.mjd != time.mjd:
             orbit = orbit.propagate(time)
-        return orbit_to_sky_coord(orbit).transform_to(self._get_azel(time)).alt > self.elevation_threshold
+        radec = orbit_to_radec(orbit)
+        altaz_frame = self._get_azel(time)
+        print(SkyCoord(ra=radec.ra, dec=radec.dec).transform_to(altaz_frame).alt)
+        #return orbit_to_sky_coord(orbit).transform_to(self._get_azel(time)).alt > self.elevation_threshold
+        return  SkyCoord(ra=radec.ra, dec=radec.dec).transform_to(altaz_frame).alt > self.elevation_threshold
+        
+        
                 
     def pass_to_pipeine(self, time, agent_id, sat_key, frozen_state):
         '''
@@ -147,6 +154,7 @@ class GroundSensor:
          
     
     def tick(self, time, satellite_truth_map):
+
         '''advance sensor in time - astropy.time.Time'''
         self._update_availability(time) # check for status changes
                 
@@ -159,8 +167,10 @@ class GroundSensor:
             task_messages_rejected = []
             for message in task_messages_unvetted:
                 if self.has_line_of_sight(message.available_state.orbit, time)and self.has_line_of_sight(message.available_state.orbit, time+self.operator.schedule_ahead_limit_s):
+                    print("Y: "+self.sensor_key+"-->"+message.sat_key)
                     task_messages_vetted.append(message)
                 else:
+                    print("N: "+self.sensor_key+"-->"+message.sat_key)
                     task_messages_rejected.append(message)
             # reject for visibility
             self.pipeline.drop_messages(SensorResponse.DROPPED_NOT_VISIBLE, task_messages_unvetted, time)

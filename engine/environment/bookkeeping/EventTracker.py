@@ -98,7 +98,10 @@ class EventTracker:
         return np.mean(uncertainy), np.mean(uncertainty_prop)
 
         
-    def report_uncertainty(self):
+    def report_uncertainty(self, sat_cat = None):
+        if sat_cat:
+            self.saved_state_catalog = sat_cat
+            
         if self.saved_state_catalog:
             no_prop, prop = self.comp_saved_cat_uncertainty()
             print(no_prop)

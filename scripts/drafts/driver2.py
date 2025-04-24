@@ -1,11 +1,11 @@
 
 from engine.environment.Environment import Environment
-from engine.agents.Trivial import RandomAgent
+from engine.agents.Trivial import DumbRandomAgent
 from engine.util.plots import basic_ground_sensor_plot_v1, basic_uncertainty_plot
 
 sat_keys = ["AEHF 1","AEHF 2","AEHF 3", "AEHF 4"]
 sensor_keys = ['mhr', 'socorro', 'boston']
-Agents = [RandomAgent("test agent",sensor_keys, sat_keys )]
+Agents = [DumbRandomAgent("test agent",sensor_keys, sat_keys )]
 
 env = Environment(sensor_keys, sat_keys)
 t, state_cat, Done = env.reset()
@@ -17,8 +17,8 @@ while Done ==False:
     t, state_cat, Done = env.step(actions)
 
 
-env.tracker.save_state_catalog(state_cat)
-env.tracker.report_uncertainty()
+env.tracker.report_uncertainty(state_cat)
+env.tracker.report()
 #env.tracker.save_instance('./driver2.pkl')
 
 basic_ground_sensor_plot_v1(env.tracker)

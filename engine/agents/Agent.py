@@ -10,14 +10,15 @@ class Agent:
         self.assigned_sensors = assigned_sensors
         self.assigned_satellites = assigned_satellites
         
-        # 0: do nothing, otherwise (sensor,sat) 
+        # action 0 will always be do-nothing; >0 (sensor,sat) tuple 
         self.action_encoding = [None] 
         for sensor in self.assigned_sensors:
             for sat in self.assigned_satellites:
                 self.action_encoding.append((sensor,sat))
                 
     def act_randomly(self):
-        return self.action_encoding[random.randint(0, self.action_space_size-1)]
+        '''acts randomly (won't pick action=0/do nothing)'''
+        return self.action_encoding[random.randint(1, self.action_space_size-1)] 
     
     def do_nothing(self):
         return self.action_encoding[0]

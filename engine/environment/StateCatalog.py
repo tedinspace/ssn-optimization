@@ -15,7 +15,8 @@ class StateCatalog:
         self.current_catalog[sat_key] = StateCatalogEntry(orbit, validity_time)
         
 class StateCatalogEntry: 
-    def __init__(self, orbit, last_seen):
+    def __init__(self, orbit, last_seen, sigma_X_m=500, sigma_dX=0.1):
         self.orbit = orbit
         self.last_seen = last_seen
-        # TODO covariance
+        self.sigma_X = sigma_X_m # [m] TODO - covariance standin 
+        self.sigma_dX = sigma_dX # [m/s]

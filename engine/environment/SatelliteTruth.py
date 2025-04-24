@@ -138,6 +138,7 @@ class ManeuverDetails:
         self.dir = np.array([random.random(), random.random(), random.random()])
         self.dir = self.dir / np.sum(self.dir)  # Normalize the direction vector
         self.maneuver = self.dir * magnitude_dv  # Scale the direction by magnitude_dv
+        self.magnitude_dv = magnitude_dv
         self.time = scenario_configs.scenario_epoch + hours_into_scenario * units.h  # Calculate the maneuver time
         self.occurred = False  # The maneuver has not yet occurred
         self.id = uuid.uuid4()

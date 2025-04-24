@@ -25,7 +25,8 @@ class Environment:
         for i, key in enumerate(self.sat_keys):
             self.satellite_truth[key] = SatelliteTruth(key, TLE_LIBRARY[key][1], TLE_LIBRARY[key][2], self.scenario_configs, 13.3)
         
-        self.satellite_truth[self.sat_keys[1]].add_maneuvers([ManeuverDetails(10, 1.5, self.scenario_configs), ManeuverDetails(15.3, 4.15, self.scenario_configs)])
+        self.satellite_truth[self.sat_keys[1]].add_maneuvers([ManeuverDetails(10, 1.5, self.scenario_configs), 
+                                                              ManeuverDetails(15.3, 4.15, self.scenario_configs)])
         self.state_catalog = StateCatalog(self.satellite_truth)
         
         self.sensors =  load_sensor_map(self.sensor_keys, self.scenario_configs)
@@ -63,7 +64,8 @@ class Environment:
             if response_messages:
                 for message in response_messages:
                     self.tracker.record(message.response_type)
-                    if message.response_type == SensorResponse.CATALOG_STATE_UPDATE_MANEUVER or message.response_type == SensorResponse.CATALOG_STATE_UPDATE_NOMINAL:
+                    if (message.response_type == SensorResponse.CATALOG_STATE_UPDATE_MANEUVER 
+                        or message.response_type == SensorResponse.CATALOG_STATE_UPDATE_NOMINAL):
                         self.state_catalog.update_state(message.sat_key, message.record.orbit, message.record.orbit_validity_time)
                         self.tracker.record(Event.STATE_UPDATE)
                         self.tracker.record_tasking_interval(message)

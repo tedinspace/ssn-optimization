@@ -42,7 +42,7 @@ class Operations:
                         print("[ALERT] OCCURS DURING THE TASKING")
                         maneuvers_to_estimate_while_tasking.append(future_maneuver)
                 
-                # ---- TODO standin -----
+                # ---- covariance standin -----
                 tmp = reestimate_1D(self.active_task.task_request.available_state,maneuvers_to_estimate, time) 
                 self.active_task.sigma_X_at_acq = tmp
                 self.active_task.sigma_X = max(tmp/2,100) 
@@ -59,7 +59,7 @@ class Operations:
                     for m in maneuvers_to_estimate:
                         tmp_orbit = tmp_orbit.propagate(m.time).apply_maneuver(Maneuver.impulse(m.maneuver << (units.m / units.s)))
                     self.active_task.orbit = tmp_orbit
-                    self.active_task.sigma_dX = .25 # TODO - standin; worse rate if man while tracking 
+                    self.active_task.sigma_dX = .25 # covariance standin; worse rate if man while tracking 
                 else:    
                     self.active_task.orbit = active_satellite_truth.orbit.propagate(self.active_task.scheduled_end)
                 self.active_task.orbit_validity_time = self.active_task.scheduled_end

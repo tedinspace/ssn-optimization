@@ -13,7 +13,7 @@ def growth_1d(sigma_x,sigma_dx, dt ):
     return sigma_x*np.sqrt(1+((sigma_dx*dt)/sigma_x)**2)
 
 def reestimate_1D(state_cat_entry, maneuvers, time_now):
-    '''TODO - covariance standin'''
+    '''covariance standin'''
     sigma_x = state_cat_entry.sigma_X
     sigma_dx = state_cat_entry.sigma_dX
     

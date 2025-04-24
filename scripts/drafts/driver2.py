@@ -17,6 +17,9 @@ while Done ==False:
     t, state_cat, Done = env.step(actions)
 
 
+env.tracker.save_state_catalog(state_cat)
+env.tracker.report_uncertainty()
 #env.tracker.save_instance('./driver2.pkl')
+
 basic_ground_sensor_plot_v1(env.tracker)
 basic_uncertainty_plot(env.tracker)

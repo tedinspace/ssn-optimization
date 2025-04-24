@@ -12,7 +12,6 @@ def basic_ground_sensor_plot_v1(loaded_tracker):
     sensor_names = list(loaded_tracker.sensor_keys)
 
     sat_keys = loaded_tracker.sat_keys
-    sensor_keys = list(loaded_tracker.sensor_keys)
 
     color_map = {key: f"C{idx % 10}" for idx, key in enumerate(sat_keys)}
 
@@ -56,13 +55,11 @@ def basic_ground_sensor_plot_v1(loaded_tracker):
     for sat_k in loaded_tracker.maneuver_truth_record:
         maneuvers = loaded_tracker.maneuver_truth_record[sat_k]
         for m in maneuvers:
-            print(m.time)
             ax.axvline(x=m.time.mjd, color=color_map[sat_k], linestyle='--', linewidth=1)
 
     for sensor_k in loaded_tracker.sensor_availability:
         type_and_times = loaded_tracker.sensor_availability[sensor_k]
         for i in range(len(type_and_times[0])):
-            print(type_and_times[1][i].mjd)
             color = 'green'
             if type_and_times[0][i]==SensorGeneralStatus.OFFLINE:
                 color = 'red'

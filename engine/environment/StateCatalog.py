@@ -9,14 +9,14 @@ class StateCatalog:
             self.satelitte_state_record[sat_key]=[]
             
         
-    def update_state(self, sat_key, orbit, validity_time):   
-        # TODO covariance
+    def update_state(self, sat_key, record):   
+        #print((record.sigma_X_at_acq-record.sigma_dX)/(record.task_length_mins*60))
         self.satelitte_state_record[sat_key].append(self.current_catalog[sat_key])
-        self.current_catalog[sat_key] = StateCatalogEntry(orbit, validity_time)
+        self.current_catalog[sat_key] = StateCatalogEntry(record.orbit, record.orbit_validity_time, record.sigma_X, record.sigma_dX)
         
 class StateCatalogEntry: 
     def __init__(self, orbit, last_seen, sigma_X_m=500, sigma_dX=0.1):
         self.orbit = orbit
         self.last_seen = last_seen
         self.sigma_X = sigma_X_m # [m] TODO - covariance standin 
-        self.sigma_dX = sigma_dX # [m/s]
+        self.sigma_dX = sigma_dX # [m/s] TODO - covariance standin 

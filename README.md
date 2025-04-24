@@ -25,3 +25,8 @@ ii. `micromamba install -c conda-forge ipykernel`
 - had to uninstall matplotlib and install matplotlib==3.7 for plotting to work 
 
 - wouldn't plot without installing nbformat==5.10.4
+
+
+## 
+
+print((record.sigma_X_at_acq-record.sigma_dX)/(record.task_length_mins*60))

@@ -1,7 +1,7 @@
 import random
 from astropy import units
 from poliastro.maneuver import Maneuver
-
+from engine.util.uncertainty import gather_unseen_maneuvers, reestimate_1D
 class Operations:
     
     def __init__(self, parent_sensor):
@@ -33,18 +33,21 @@ class Operations:
                 # CASE 2: ABLE TO ACQUIRE
                 self.active_task.able_to_acquire = True
                 # Question 1: has it maneuver since the state (that the sensor has) was updated
-                maneuvers_to_estimate = []
-                for past_maneuver in active_satellite_truth.maneuvers_occurred:
-                    if past_maneuver.time > self.active_task.task_request.available_state.last_seen:
-                        maneuvers_to_estimate.append(past_maneuver) 
-                #print(len(maneuvers_to_estimate))
-                # Question 2: will it maneuver during the sensing duration? 
+                maneuvers_to_estimate = gather_unseen_maneuvers(active_satellite_truth.maneuvers_occurred,self.active_task.task_request.available_state.last_seen )
                 
+                # Question 2: will it maneuver during the sensing duration? 
                 maneuvers_to_estimate_while_tasking = []
                 for future_maneuver in active_satellite_truth.maneuvers_remaining:
                     if future_maneuver.time > self.active_task.scheduled_start and future_maneuver.time < self.active_task.scheduled_end:
                         print("[ALERT] OCCURS DURING THE TASKING")
                         maneuvers_to_estimate_while_tasking.append(future_maneuver)
+                
+                # ---- TODO standin -----
+                tmp = reestimate_1D(self.active_task.task_request.available_state,maneuvers_to_estimate, time) 
+                self.active_task.sigma_X_at_acq = tmp
+                self.active_task.sigma_X = max(tmp/2,100) 
+                self.active_task.sigma_dX = .1 
+                
                 
                 #print(len(maneuvers_to_estimate_while_tasking))        
                 if len(maneuvers_to_estimate)> 0 or len(maneuvers_to_estimate_while_tasking)>0:
@@ -56,9 +59,12 @@ class Operations:
                     for m in maneuvers_to_estimate:
                         tmp_orbit = tmp_orbit.propagate(m.time).apply_maneuver(Maneuver.impulse(m.maneuver << (units.m / units.s)))
                     self.active_task.orbit = tmp_orbit
+                    self.active_task.sigma_dX = .25 # TODO - standin; worse rate if man while tracking 
                 else:    
                     self.active_task.orbit = active_satellite_truth.orbit.propagate(self.active_task.scheduled_end)
                 self.active_task.orbit_validity_time = self.active_task.scheduled_end
+                
+                
                 
                 
             # Question 3: what will happen to the state estimation (if maneuvered, maneuvering, or not)
@@ -136,6 +142,9 @@ class TaskRecord:
         self.maneuvers_detected = False
         self.orbit = None
         self.orbit_validity_time = None
+        self.sigma_X = None
+        self.sigma_dX = None
+        self.sigma_X_at_acq = None
    
           
 # -----------------------------------------------------------------------------------------

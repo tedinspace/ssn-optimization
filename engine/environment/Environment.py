@@ -68,7 +68,7 @@ class Environment:
                         or message.response_type == SensorResponse.CATALOG_STATE_UPDATE_NOMINAL):
                         self.state_catalog.update_state(message.sat_key, message.record)
                         self.tracker.record(Event.STATE_UPDATE)
-                        self.tracker.record_tasking_interval(message)
+                        self.tracker.record_state_update_info(message)
                     if message.response_type == SensorResponse.FAILURE_OBJECT_LOST:
                         self.tracker.record_loss(message.sat_key)
                         

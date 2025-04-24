@@ -15,10 +15,13 @@ class EventTracker:
         self.maneuver_truth_record = {}
         self.sensor_availability = {}
         
+        self.uncertainty_trajs = {} # by object
+        
         self.sat_keys = set()
         self.sensor_keys = set()
         
         self.scenario_configs = None
+        
         
         
         
@@ -32,12 +35,28 @@ class EventTracker:
         self.scenario_configs = scenario_configs
                   
          
-    def record_tasking_interval(self,state_update_response):
+    def record_state_update_info(self,state_update_response):
+        '''
+            1. records successful tracking dirations
+            2. 
+        '''
+        # 1. 
         if not state_update_response.sensor_key in self.tasking_record:
             self.tasking_record[state_update_response.sensor_key]={}
         if not state_update_response.sat_key in self.tasking_record[state_update_response.sensor_key]:
             self.tasking_record[state_update_response.sensor_key][state_update_response.sat_key]=[]
         self.tasking_record[state_update_response.sensor_key][state_update_response.sat_key].append(state_update_response)
+        # 2. 
+        if not state_update_response.sat_key in self.uncertainty_trajs:
+            self.uncertainty_trajs[state_update_response.sat_key] = {}
+            self.uncertainty_trajs[state_update_response.sat_key]['times']=[]
+            self.uncertainty_trajs[state_update_response.sat_key]['sigma_X']=[]
+        self.uncertainty_trajs[state_update_response.sat_key]['times'].append( state_update_response.record.scheduled_start.mjd)
+        self.uncertainty_trajs[state_update_response.sat_key]['times'].append( state_update_response.record.orbit_validity_time.mjd)
+        self.uncertainty_trajs[state_update_response.sat_key]['sigma_X'].append( state_update_response.record.sigma_X_at_acq)
+        self.uncertainty_trajs[state_update_response.sat_key]['sigma_X'].append( state_update_response.record.sigma_X)
+            
+        
 
         
     def record(self, event_type):

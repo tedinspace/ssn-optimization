@@ -2,6 +2,26 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from engine.environment.sensors.GroundSensor import SensorGeneralStatus
 
+def c_map(keys):
+    '''get color maps for keys'''
+    return {key: f"C{idx % 10}" for idx, key in enumerate(keys)}
+
+def basic_uncertainty_plot(loaded_tracker):
+    color_map = c_map(loaded_tracker.sat_keys)
+
+    plt.figure(figsize=(10, 6))
+    for object_id, obj_data in loaded_tracker.uncertainty_trajs.items():
+        plt.plot(obj_data['times'], obj_data['sigma_X'], label=object_id, color=color_map[object_id])
+
+    plt.xlabel('Time [mjd]')
+    plt.ylabel('Uncertainty [meters]')
+    plt.title('Uncertainty vs Time for')
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.yscale('log')
+    plt.show()
+
 def basic_ground_sensor_plot_v1(loaded_tracker):
     '''
         includes
@@ -11,9 +31,7 @@ def basic_ground_sensor_plot_v1(loaded_tracker):
     '''
     sensor_names = list(loaded_tracker.sensor_keys)
 
-    sat_keys = loaded_tracker.sat_keys
-
-    color_map = {key: f"C{idx % 10}" for idx, key in enumerate(sat_keys)}
+    color_map = c_map(loaded_tracker.sat_keys)
 
     fig, ax = plt.subplots(figsize=(12, 6))
     

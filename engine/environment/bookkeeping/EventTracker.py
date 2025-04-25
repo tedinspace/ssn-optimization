@@ -17,6 +17,8 @@ class EventTracker:
         self.lost_objects = set()
         self.tasking_record = {}
         self.maneuver_truth_record = {}
+        self.unique_mans = set()
+        self.unique_sats = set()
         self.sensor_availability = {}
         
         self.uncertainty_trajs = {} # by object
@@ -65,9 +67,10 @@ class EventTracker:
         self.uncertainty_trajs[state_update_response.sat_key]['times'].append( state_update_response.record.orbit_validity_time.mjd)
         self.uncertainty_trajs[state_update_response.sat_key]['sigma_X'].append( state_update_response.record.sigma_X_at_acq)
         self.uncertainty_trajs[state_update_response.sat_key]['sigma_X'].append( state_update_response.record.sigma_X)
-            
+        # 3. 
         
-    
+        self.unique_mans = self.unique_mans.union(state_update_response.record.det_man_ids)
+        self.unique_sats.add(state_update_response.sat_key)
         
     def record(self, event_type):
         '''event_type - Event enum 
@@ -116,7 +119,7 @@ class EventTracker:
         if self.lost_objects:
             print('loss: ')
             print(self.lost_objects)
+        print('unique maneuvers: ',len(self.unique_mans) )
+        print('unique sats tracked: ',len(self.unique_sats) )
             
-    
-     
     

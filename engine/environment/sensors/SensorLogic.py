@@ -33,14 +33,14 @@ class Operations:
                 # CASE 2: ABLE TO ACQUIRE
                 self.active_task.unable_to_acquire = False
                 # Question 1: has it maneuver since the state (that the sensor has) was updated
-                maneuvers_to_estimate = gather_unseen_maneuvers(active_satellite_truth.maneuvers_occurred,self.active_task.task_request.available_state.last_seen )
-                
+                maneuvers_to_estimate, m_ids = gather_unseen_maneuvers(active_satellite_truth.maneuvers_occurred,self.active_task.task_request.available_state.last_seen )
                 # Question 2: will it maneuver during the sensing duration? 
                 maneuvers_to_estimate_while_tasking = []
                 for future_maneuver in active_satellite_truth.maneuvers_remaining:
                     if future_maneuver.time > self.active_task.scheduled_start and future_maneuver.time < self.active_task.scheduled_end:
                         print("[ALERT] OCCURS DURING THE TASKING")
                         maneuvers_to_estimate_while_tasking.append(future_maneuver)
+                        m_ids.add(future_maneuver.id)
                 
                 # ---- covariance standin -----
                 tmp = reestimate_1D(self.active_task.task_request.available_state,maneuvers_to_estimate, time) 
@@ -56,7 +56,8 @@ class Operations:
                 #  handle maneuvers during case
                 if len(maneuvers_to_estimate_while_tasking) > 0:
                     tmp_orbit = active_satellite_truth.orbit
-                    for m in maneuvers_to_estimate:
+                    for m in maneuvers_to_estimate_while_tasking:
+                        
                         tmp_orbit = tmp_orbit.propagate(m.time).apply_maneuver(Maneuver.impulse(m.maneuver << (units.m / units.s)))
                     self.active_task.orbit = tmp_orbit
                     self.active_task.sigma_dX = .25 # covariance standin; worse rate if man while tracking 
@@ -64,8 +65,7 @@ class Operations:
                     self.active_task.orbit = active_satellite_truth.orbit.propagate(self.active_task.scheduled_end)
                 
                 self.active_task.orbit_validity_time = self.active_task.scheduled_end
-                
-                
+                self.active_task.det_man_ids = m_ids
                 
             # Question 3: what will happen to the state estimation (if maneuvered, maneuvering, or not)
     
@@ -146,6 +146,7 @@ class TaskRecord:
         self.sigma_dX = None
         self.sigma_X_at_acq = None
         self.unable_to_acquire = False
+        self.det_man_ids = set()
    
           
 # -----------------------------------------------------------------------------------------

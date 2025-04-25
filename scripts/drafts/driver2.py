@@ -5,7 +5,7 @@ from engine.agents.rl.QTableAgent import QTableAgent
 from engine.agents.Algorithmic import BasicRevisitAgent
 from engine.util.plots import basic_ground_sensor_plot_v1, basic_uncertainty_plot
 
-sat_keys = ["AEHF 1","AEHF 2","AEHF 3", "AEHF 4"]
+sat_keys = ["AEHF 2","AEHF 3", "AEHF 4"]
 sensor_keys = ['mhr', 'socorro', 'boston']
 
 env = Environment(sensor_keys, sat_keys)

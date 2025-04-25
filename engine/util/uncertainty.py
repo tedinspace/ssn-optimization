@@ -3,11 +3,13 @@ from engine.util.time import seconds_between
 
 def gather_unseen_maneuvers(maneuvers_occurred, last_seen_time):
     '''list of ManeuverInfo objects and astropy Time time'''
+    unqiue_man_ids = set()
     maneuvers_to_estimate = []
     for past_maneuver in maneuvers_occurred:
         if past_maneuver.time > last_seen_time:
             maneuvers_to_estimate.append(past_maneuver) 
-    return maneuvers_to_estimate
+            unqiue_man_ids.add(past_maneuver.id)
+    return maneuvers_to_estimate, unqiue_man_ids
 
 def growth_1d(sigma_x,sigma_dx, dt ):
     return sigma_x*np.sqrt(1+((sigma_dx*dt)/sigma_x)**2)

@@ -106,9 +106,6 @@ class GroundSensor:
                 
                 # if we are going offline
                 if self.general_status == SensorGeneralStatus.OFFLINE:
-                    print('off')
-                    print(self.operator.active_task)
-                    print(len(self.operator.scheduled_tasks))
                     # > drop active task
                     if self.operator.active_task !=None:
                         self.pipeline.drop_message(SensorResponse.DROPPED_SCHEDULING, self.operator.active_task.task_request, time)
@@ -120,10 +117,7 @@ class GroundSensor:
                             self.pipeline.drop_message(SensorResponse.DROPPED_SCHEDULING, task.task_request, time)
                         
                         self.operator.scheduled_tasks = []
-                else:
-                    print('on')
-                    print(self.operator.active_task)
-                    print(len(self.operator.scheduled_tasks))
+                
                         
                     
      
@@ -134,8 +128,6 @@ class GroundSensor:
         '''
         if orbit.epoch.mjd != time.mjd:
             orbit = orbit.propagate(time)
-        #print(SkyCoord(ra=radec.ra, dec=radec.dec).transform_to(altaz_frame).alt)
-        #return orbit_to_sky_coord(orbit).transform_to(self._get_azel(time)).alt > self.elevation_threshold
         return   GCRS( CartesianRepresentation(orbit.r << units.km), obstime=orbit.epoch).transform_to(self._get_azel(time)).alt > self.elevation_threshold
         
         

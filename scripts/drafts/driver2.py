@@ -1,6 +1,7 @@
 
 from engine.environment.Environment import Environment
 from engine.agents.Trivial import RandomAgent, DumbRandomAgent
+from engine.agents.rl.QTableAgent import QTableAgent
 from engine.agents.Algorithmic import BasicRevisitAgent
 from engine.util.plots import basic_ground_sensor_plot_v1, basic_uncertainty_plot
 
@@ -8,7 +9,7 @@ sat_keys = ["AEHF 1","AEHF 2","AEHF 3", "AEHF 4"]
 sensor_keys = ['mhr', 'socorro', 'boston']
 
 env = Environment(sensor_keys, sat_keys)
-Agents = [BasicRevisitAgent("test agent",sensor_keys, sat_keys, env.scenario_configs )]
+Agents = [QTableAgent("test agent",sensor_keys, sat_keys, env.scenario_configs )]
 
 t, state_cat, Done = env.reset()
 

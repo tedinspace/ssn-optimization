@@ -83,6 +83,8 @@ class AgentBaseSmarter:
         self.action_encoding = vis_map_to_action_tuples(self.vis_map_sensor)
 
         self.action_space_size = len(self.action_encoding)
+        
+        
 
     def get_sensor_vm(self):
         """
@@ -101,6 +103,9 @@ class AgentBaseSmarter:
         - dict: ([sat_key]: set(sensor_keys)) Visibility map keyed by satellite 
         """
         return self.vis_map_sat
+    
+    def get_action_encoding(self):
+        return self.action_encoding
 
     def act_randomly(self):
         """

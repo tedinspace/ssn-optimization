@@ -13,3 +13,7 @@ DEFAULT_SCENARIO_EPOCH = Time('2025-04-06 00:00:00.000', format='iso')
 
 def seconds_between(t1, t2):
     return np.abs(t1.mjd - t2.mjd)*SPD
+
+def mins_ago(t1,t2):
+    '''t2>t1'''
+    return (t2.mjd - t1.mjd)*MPD

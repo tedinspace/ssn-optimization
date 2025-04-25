@@ -9,6 +9,8 @@ from engine.builder.satellites.states import TLE_LIBRARY
 from engine.builder.sensors.ssn import load_sensor_map
 from engine.util.time import  DEFAULT_SCENARIO_EPOCH
 
+from engine.util.indexing import dynamic_dict
+
 class Environment: 
     def __init__(self, sensor_keys, sat_keys):
         ''''''
@@ -35,7 +37,7 @@ class Environment:
         
         self.t = self.scenario_configs.scenario_epoch.copy()
         
-        return self.t, self.state_catalog, False
+        return self.t, self.state_catalog,[], False
         
     def step(self, actions):
         ''''''
@@ -58,6 +60,7 @@ class Environment:
             self.sensors[sensor_key].tick(self.t, self.satellite_truth)
             
         # 4. gather events
+        events_out = []
         for sensor_key in self.sensors:
             response_messages = self.sensors[sensor_key].check_pipeline(self.t) 
             if response_messages:
@@ -68,7 +71,8 @@ class Environment:
                         self.state_catalog.update_state(message.sat_key, message.record)
                         self.tracker.record(Event.STATE_UPDATE)
                         self.tracker.record_state_update_info(message)
+                        events_out.append(message)
                     if message.response_type == SensorResponse.FAILURE_OBJECT_LOST:
                         self.tracker.record_loss(message.sat_key)
                         
-        return self.t, self.state_catalog, self.t > self.scenario_configs.scenario_end
+        return self.t, self.state_catalog, events_out, self.t > self.scenario_configs.scenario_end

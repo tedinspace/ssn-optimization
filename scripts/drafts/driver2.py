@@ -11,13 +11,18 @@ sensor_keys = ['mhr', 'socorro', 'boston']
 env = Environment(sensor_keys, sat_keys)
 Agents = [QTableAgent("test agent",sensor_keys, sat_keys, env.scenario_configs )]
 
-t, state_cat, Done = env.reset()
+t, state_cat,events_out, Done = env.reset()
 
 while Done ==False:
+    # take actions
     actions = {}
     for agent in Agents:
         actions[agent.agent_id]=agent.decide(t, state_cat)
-    t, state_cat, Done = env.step(actions)
+    # apply actions
+    t, state_cat, events_out, Done = env.step(actions)
+    
+    # update agent
+    agent.update_q_table(t, state_cat, events_out)
 
 
 env.tracker.report_uncertainty(state_cat)

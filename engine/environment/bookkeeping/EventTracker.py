@@ -81,6 +81,12 @@ class EventTracker:
         else:
             self.event_counts[event_type]=1
             
+    def pull_record(self,event_type):
+        if event_type in self.event_counts:
+            return self.event_counts[event_type]
+        return 0
+        
+            
     def record_loss(self, sat_key):
         '''keep track of lost object keys'''
         self.lost_objects.add(sat_key)
@@ -89,7 +95,9 @@ class EventTracker:
         self.saved_state_catalog = state_cat
         
         
-    def comp_saved_cat_uncertainty(self):
+    def comp_saved_cat_uncertainty(self, state_cat=None):
+        if state_cat:
+            self.saved_state_catalog = state_cat
         if self.saved_state_catalog:
             uncertainy = []
             uncertainty_prop = []

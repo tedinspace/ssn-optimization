@@ -28,6 +28,8 @@ class Environment:
             self.satellite_truth[key] = SatelliteTruth(key, TLE_LIBRARY[key][1], TLE_LIBRARY[key][2], self.scenario_configs, 13.3)
         
         self.satellite_truth[self.sat_keys[1]].add_maneuvers([ManeuverDetails(10, 1.5, self.scenario_configs), ManeuverDetails(15.3, 4.15, self.scenario_configs)])
+        self.unique_maneuvers  = 2 
+        
         self.state_catalog = StateCatalog(self.satellite_truth)
         
         self.sensors =  load_sensor_map(self.sensor_keys, self.scenario_configs)

@@ -104,19 +104,25 @@ class QTableAgent(AgentBaseSmarter):
         
     def decide_onpolicy(self,state_keys):
         return  self.q_table.get_best_action(state_keys)
+    
+    
                  
-    def decide(self, time, state_cat):
+    def decide(self, time, state_cat, evaluate=False):
          # 1. discretize state
         state_keys = self.discretize_current_state(time, state_cat)
         
-        # 2. select action
-        if random.random() <  self.eps_threshold :
-            if random.random() < 0.8:
-                action_idx = 0
+        if not evaluate: # training
+            # 2. select action
+            if random.random() <  self.eps_threshold :
+                if random.random() < 0.8:
+                    action_idx = 0
+                else:
+                    action_idx = super().act_randomly_idx()
             else:
-                action_idx = super().act_randomly_idx()
-        else:
+                action_idx = self.decide_onpolicy(state_keys)
+        else: # evaluatino
             action_idx = self.decide_onpolicy(state_keys)
+            
             
             
         

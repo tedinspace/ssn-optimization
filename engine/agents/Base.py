@@ -1,5 +1,6 @@
 import random
 from engine.util.vis import generate_vis_map, vis_map_to_action_tuples
+from engine.environment.Scenario import Scenario
 
 class AgentBaseDumb:
     def __init__(self, agent_id, assigned_sensors,assigned_satellites ):
@@ -29,19 +30,25 @@ class AgentBaseDumb:
         
         
 class AgentBaseSmarter:
-    def __init__(self, agent_id, assigned_sensors, assigned_satellites ):
+    def __init__(self, agent_id, assigned_sensors, assigned_satellites, scenario_configs=Scenario() ):
         self.agent_id = agent_id
         self.n_assigned_sensors = len(assigned_sensors)
         self.n_assigned_satellites = len(assigned_satellites)
         self.assigned_sensors = assigned_sensors
         self.assigned_satellites = assigned_satellites
         
-        self.vis_map = generate_vis_map(assigned_sensors, assigned_satellites)
+        by_sensor, by_sat = generate_vis_map(assigned_sensors, assigned_satellites, scenario_configs)
+        self.vis_map_sensor = by_sensor
+        self.vis_map_sat = by_sat
 
-        self.action_encoding = vis_map_to_action_tuples(self.vis_map)
+        self.action_encoding = vis_map_to_action_tuples(self.vis_map_sensor)
                 
         self.action_space_size = len(self.action_encoding)
         
+    def get_sensor_vm(self):
+        return self.vis_map_sensor    
+    def get_sat_vm(self):
+        return self.vis_map_sat    
         
     def act_randomly(self):
         return self.action_encoding[random.randint(0, self.action_space_size-1)] 

@@ -17,8 +17,10 @@ def generate_vis_map(sensor_keys, sat_keys, scenario_configs=Scenario()):
         vis_map[skey]=set()
         
     sat_map = {}
+    vis_map_sat = {}
     for skey in sat_keys:
         sat_map[skey]=tle_to_orbit(TLE_LIBRARY[skey][1], TLE_LIBRARY[skey][2], scenario_configs.scenario_epoch)
+        vis_map_sat[skey]=set()
         
     time = scenario_configs.scenario_epoch.copy()
     dt = 30*3600*units.s
@@ -31,10 +33,11 @@ def generate_vis_map(sensor_keys, sat_keys, scenario_configs=Scenario()):
                     ##
                     if  GCRS( CartesianRepresentation(orbit.r << units.km), obstime=orbit.epoch).transform_to(az_el).alt > 5*units.deg:
                         vis_map[sensor].add(sat)
+                        vis_map_sat[sat].add(sensor)
                     
         time += dt
         
-    return vis_map
+    return vis_map, vis_map_sat
 
 
 def vis_map_to_action_tuples(vis_map):

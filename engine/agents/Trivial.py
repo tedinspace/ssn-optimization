@@ -8,7 +8,7 @@ class DumbRandomAgent(AgentBaseDumb):
         super().__init__(agent_id, assigned_sensors, assigned_satellites)
         self.do_nothing_rate = do_nothing_rate
                  
-    def decide(self):
+    def decide(self, *args, **kwargs ):
         if random.random() < self.do_nothing_rate:
             return super().do_nothing()
         return super().act_randomly()
@@ -23,7 +23,7 @@ class RandomAgent(AgentBaseSmarter):
         super().__init__(agent_id, assigned_sensors, assigned_satellites)
         self.do_nothing_rate = do_nothing_rate
                  
-    def decide(self):
+    def decide(self, *args, **kwargs):
         if random.random() < self.do_nothing_rate:
             return super().do_nothing()
         return super().act_randomly()

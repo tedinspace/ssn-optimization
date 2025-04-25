@@ -113,7 +113,10 @@ class AgentBaseSmarter:
         Returns:
         - A randomly selected action from the visibility-based action encoding.
         """
-        return self.action_encoding[random.randint(0, self.action_space_size - 1)]
+        return self.action_encoding[self.act_randomly_idx()]
+    
+    def act_randomly_idx(self):
+        return random.randint(0, self.action_space_size - 1)
 
     def do_nothing(self):
         """

@@ -176,10 +176,10 @@ class GroundSensor:
             if unschedulable_task_requests:
                 self.pipeline.drop_messages(SensorResponse.DROPPED_SCHEDULING, unschedulable_task_requests, time)
             if completed_task!=None:
-                if completed_task.able_to_acquire == True:
-                    self.pipeline.send_state_updated(completed_task, time)
+                if completed_task.unable_to_acquire == True:
+                    self.pipeline.drop_message(SensorResponse.FAILURE_OBJECT_LOST, completed_task.task_request, time)  
                 else:
-                    self.pipeline.drop_message(SensorResponse.FAILURE_OBJECT_LOST, completed_task.task_request, time)             
+                    self.pipeline.send_state_updated(completed_task, time)
                 
         else:
             # sensor offline; 

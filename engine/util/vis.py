@@ -1,5 +1,5 @@
 
-from astropy.coordinates import CartesianRepresentation, TEME, GCRS, AltAz
+from astropy.coordinates import CartesianRepresentation, GCRS, AltAz
 from astropy import units 
 from engine.util.astro import create_earth_location, tle_to_orbit
 from engine.environment.Scenario import Scenario

@@ -25,13 +25,13 @@ class Operations:
              
             if not self.parent_sensor.has_line_of_sight(active_satellite_truth.orbit, time):
                 # CASE 1: UNABLE TO ACQUIRE
-                self.active_task.able_to_acquire = False
+                self.active_task.unable_to_acquire = True
                 print("[ALERT] UNABLE TO ACQUIRE")
                 print(self.active_task.task_request.sensor_key)
                 print(self.active_task.task_request.sat_key)
             else:
                 # CASE 2: ABLE TO ACQUIRE
-                self.active_task.able_to_acquire = True
+                self.active_task.unable_to_acquire = False
                 # Question 1: has it maneuver since the state (that the sensor has) was updated
                 maneuvers_to_estimate = gather_unseen_maneuvers(active_satellite_truth.maneuvers_occurred,self.active_task.task_request.available_state.last_seen )
                 
@@ -62,8 +62,8 @@ class Operations:
                     self.active_task.sigma_dX = .25 # covariance standin; worse rate if man while tracking 
                 else:    
                     self.active_task.orbit = active_satellite_truth.orbit.propagate(self.active_task.scheduled_end)
-                self.active_task.orbit_validity_time = self.active_task.scheduled_end
                 
+                self.active_task.orbit_validity_time = self.active_task.scheduled_end
                 
                 
                 
@@ -102,16 +102,17 @@ class Operations:
         for task_req in incoming_valid_task_messages:
             if len(self.scheduled_tasks) ==0:
                 # A. nothing on the queue
-                requestedStartTime =  randomize_slew_time(time) 
+                requestedStartTime =  randomize_slew_time(self.active_task.scheduled_end) 
                 
                 if self.active_task.task_request.sat_key != task_req.sat_key: # TODO available at request time
                     # not the active task AND TODO valid time
-                    
+                 
                     self.scheduled_tasks.append(TaskRecord(requestedStartTime, task_req))
                 else: 
                     unschedulable_task_request.append(task_req)
             else:
                 # B. stuff already scheduled 
+               
                 requestedStartTime =  randomize_slew_time(self.scheduled_tasks[-1].scheduled_end ) 
                
                 if (requestedStartTime < time + self.schedule_ahead_limit_s 
@@ -138,13 +139,13 @@ class TaskRecord:
         self.scheduled_end = start_time + self.task_length_mins * 60 * units.s  
         self.tasking_started = False
         self.tasking_completed = False
-        self.able_to_acquire = None
         self.maneuvers_detected = False
         self.orbit = None
         self.orbit_validity_time = None
         self.sigma_X = None
         self.sigma_dX = None
         self.sigma_X_at_acq = None
+        self.unable_to_acquire = False
    
           
 # -----------------------------------------------------------------------------------------

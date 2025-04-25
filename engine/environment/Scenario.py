@@ -1,5 +1,6 @@
-from engine.util.time import DEFAULT_DELTA_T, HPD
+from engine.util.time import DEFAULT_DELTA_T, HPD,  DEFAULT_SCENARIO_EPOCH
 from astropy.time import Time
+
 
 class Scenario:
     """
@@ -14,7 +15,7 @@ class Scenario:
         n_steps: Returns the number of time steps in the scenario.
     """
     
-    def __init__(self, scenario_epoch, scenario_length, delta_t=None):
+    def __init__(self, scenario_epoch=DEFAULT_SCENARIO_EPOCH, scenario_length=24.0, delta_t=DEFAULT_DELTA_T):
         """
         Initializes the Scenario class with a given epoch, length, and optional time delta.
 
@@ -23,10 +24,8 @@ class Scenario:
             scenario_length (float): The length of the simulation in hours.
             delta_t (float, optional): The time step for the simulation in seconds. If not provided, uses `DEFAULT_DELTA_T`.
         """
-        if delta_t is None:
-            self._dt = DEFAULT_DELTA_T  # [s]
-        else:
-            self._dt = delta_t  # [s]
+
+        self._dt = delta_t  # [s]
 
         self._scenario_length_hours = scenario_length  # [hours]
 

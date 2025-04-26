@@ -36,3 +36,11 @@ Experiment 0 involves evaluation on a fairly fixed environment (still some rando
 6. tasks dropped (different categories)
 
 7. lost objects? 
+
+
+### Training Script
+
+python -m scripts.experiment0.qt-training
+
+
+### Evaluation Scripts

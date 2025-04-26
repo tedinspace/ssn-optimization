@@ -20,26 +20,26 @@ env = Environment(sensor_keys, sat_keys)
 #Agents = [DoNothingAgent("test agent",sensor_keys, sat_keys )]
 
 # > pure random 
-sim_track = SimOutcomeTracker("pure-r-eval-exp0",sensor_keys, sat_keys, N_ROUNDS)
-Agents = [RandomAgent("test agent",sensor_keys, sat_keys,do_nothing_rate=0 )]
+#sim_track = SimOutcomeTracker("pure-r-eval-exp0",sensor_keys, sat_keys, N_ROUNDS)
+#Agents = [RandomAgent("test agent",sensor_keys, sat_keys,do_nothing_rate=0 )]
 
 # > restrained random 
 #sim_track = SimOutcomeTracker("rest-r-eval-exp0",sensor_keys, sat_keys, N_ROUNDS)
 #Agents = [RandomAgent("test agent",sensor_keys, sat_keys )]
 
 # > basic revisit 
-#sim_track = SimOutcomeTracker("revisit-alg-exp0",sensor_keys, sat_keys, N_ROUNDS)
-#Agents = [BasicRevisitAgent("test agent",sensor_keys, sat_keys )]
+sim_track = SimOutcomeTracker("revisit-alg-exp0",sensor_keys, sat_keys, N_ROUNDS)
 
 
 
+print(sim_track.id)
 for i in range(N_ROUNDS):
     env = Environment(sensor_keys, sat_keys) # TODO not ideal reset
     t, state_cat,events_out, Done = env.reset()
     TOTAL_REWARDS =0
     
     time_last_tasked = init_mapping(sat_keys, None)
-
+    Agents = [BasicRevisitAgent("test agent",sensor_keys, sat_keys )]
     
     while Done ==False:
         # take actions

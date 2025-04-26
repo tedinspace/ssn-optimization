@@ -11,7 +11,7 @@ import pickle
 
 
 class DynamicQTable:
-    def __init__(self, n_actions, gamma=.99, alpha=0.01):
+    def __init__(self, n_actions, gamma=.9, alpha=0.5):
         self.q_table = dynamic_dict()
         self.n_actions = n_actions
         self.gamma = gamma
@@ -50,7 +50,7 @@ class DynamicQTable:
 
 class QTableAgent(AgentBaseSmarter):
     
-    def __init__(self, agent_id, assigned_sensors, assigned_satellites, scenario_configs=Scenario(), epsilon=1, epsilon_dec=.999, epsilon_min=0.05):
+    def __init__(self, agent_id, assigned_sensors, assigned_satellites, scenario_configs=Scenario(), epsilon=1, epsilon_dec=0.95, epsilon_min=0.05):
         super().__init__(agent_id, assigned_sensors, assigned_satellites, scenario_configs)
         self.agent_id = agent_id
         self.assigned_sensors = assigned_sensors
@@ -146,10 +146,11 @@ class QTableAgent(AgentBaseSmarter):
         
         self.prev_action_idx = action_idx
         self.prev_state_keys = state_keys
-        self.eps_threshold = max(self.epsilon_min, self.eps_threshold * self.epsilon_dec)
+        #self.eps_threshold = max(self.epsilon_min, self.eps_threshold * self.epsilon_dec)
         
         return action
-    
+    def decay_eps(self):
+        self.eps_threshold = max(self.epsilon_min, self.eps_threshold * self.epsilon_dec)
     def update_q_table(self, time, state_cat, events, evaluate=False):
         # 1. costs: cost of previous action and TODO cost of state age? 
         cost = self.cost_of_prev_action

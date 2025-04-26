@@ -25,17 +25,3 @@ ii. `micromamba install -c conda-forge ipykernel`
 - had to uninstall matplotlib and install matplotlib==3.7 for plotting to work 
 
 - wouldn't plot without installing nbformat==5.10.4
-
-
-## Metrics
-
-
-1. covariance of catalog (prop/unprop)
-
-2. number of uniqued maneuvers detected
-
-3. number of unique objects tracked
-
-4. reward value
-
-5. dropped tasks (scheduling + offline + other?)

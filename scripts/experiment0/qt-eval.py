@@ -5,13 +5,13 @@ from engine.environment.bookkeeping.SimOutcomeTracker import SimOutcomeTracker
 from engine.util.plots import basic_ground_sensor_plot_v1, basic_uncertainty_plot
 import pickle
 
-N_ROUNDS =3
+N_ROUNDS =100
 
 sat_keys = ["AEHF 2","AEHF 3", "AEHF 4"]
 sensor_keys = ['mhr', 'socorro', 'boston']
 env = Environment(sensor_keys, sat_keys)
 
-sim_track = SimOutcomeTracker("q-table-eval",sensor_keys, sat_keys, N_ROUNDS)
+sim_track = SimOutcomeTracker("q-table-eval-NAIVE",sensor_keys, sat_keys, N_ROUNDS)
 #Agents = [QTableAgent("test agent",sensor_keys, sat_keys, env.scenario_configs )]
 
 

@@ -4,7 +4,7 @@ from engine.agents.rl.QTableAgent import QTableAgent
 from engine.environment.bookkeeping.SimOutcomeTracker import SimOutcomeTracker
 from engine.util.plots import basic_ground_sensor_plot_v1, basic_uncertainty_plot
 
-N_ROUNDS =5
+N_ROUNDS =100
 
 sat_keys = ["AEHF 2","AEHF 3", "AEHF 4"]
 sensor_keys = ['mhr', 'socorro', 'boston']

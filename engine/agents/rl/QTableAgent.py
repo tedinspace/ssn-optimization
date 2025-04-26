@@ -11,7 +11,7 @@ import pickle
 
 
 class DynamicQTable:
-    def __init__(self, n_actions, gamma=.9, alpha=0.5):
+    def __init__(self, n_actions, gamma=.9, alpha=0.25):
         self.q_table = dynamic_dict()
         self.n_actions = n_actions
         self.gamma = gamma
@@ -76,6 +76,8 @@ class QTableAgent(AgentBaseSmarter):
         self.eps_threshold = epsilon
         self.epsilon_dec = epsilon_dec
         self.epsilon_min = epsilon_min
+        
+        self.state_age_penality = 75
         
         
     def save(self, file_with_path):
@@ -155,6 +157,8 @@ class QTableAgent(AgentBaseSmarter):
         # 1. costs: cost of previous action and TODO cost of state age? 
         cost = self.cost_of_prev_action
         
+        cost+=  compute_state_age_cost(time, state_cat)
+        
         # 2. rewards
         reward = 0
         for e in events:
@@ -182,5 +186,19 @@ def compute_tasking_cost(mins_ago, max_cost=10, min_cost=1, time_thresh_mins=35)
         return min_cost
     else:
         return (max_cost-min_cost)/(0-time_thresh_mins)*mins_ago + max_cost
+    
+    
+def compute_state_age_cost(time, state_cat, beta=.1, threshold=90):
+    cost = 0
+    for sat_key in state_cat.current_catalog:
+        last_seen_m = mins_ago(state_cat.current_catalog[sat_key].last_seen,time)
+        if last_seen_m > threshold:
+            #print(sat_key)
+            #print(last_seen_m)
+            c = beta*last_seen_m
+            #print(c)
+            cost+=c
+    return cost
+        
     
     

@@ -57,13 +57,3 @@ class SimOutcomeTracker:
         self.dropped_scheduling.append(env.tracker.pull_record(SensorResponse.DROPPED_SCHEDULING))
         self.dropped_scheduling_2.append(env.tracker.pull_record(SensorResponse.DROPPED_NOT_VISIBLE))
         self.dropped_track_failure.append(env.tracker.pull_record(SensorResponse.FAILURE_OBJECT_LOST))
-        
-    
-        
-    
-        
-        
-        
-        
-    
-        

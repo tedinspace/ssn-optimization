@@ -1,6 +1,31 @@
 from engine.agents.Base import AgentBaseDumb, AgentBaseSmarter
 import random
 
+
+class DoNothingAgent(AgentBaseDumb):
+    """
+        Does nothing
+    """
+    
+    def __init__(self, agent_id, assigned_sensors, assigned_satellites):
+        super().__init__(agent_id, assigned_sensors, assigned_satellites)
+
+    def decide(self, *args, **kwargs):
+        """
+        Always does nothing
+
+        Returns:
+        - None
+        """
+        return super().do_nothing()
+    
+    def reset(self):
+        """
+        Reset any internal state.
+        """
+        super().reset()
+
+
 class DumbRandomAgent(AgentBaseDumb):
     """
         Randomly decided from non-visibility informed actions

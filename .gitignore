@@ -24,5 +24,6 @@ poliastro-library-vetting.ipynb
 covariance.py
 function-tests.ipynb
 create-visuals.ipynb
+results.ipynb
 
 *.pkl

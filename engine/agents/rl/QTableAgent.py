@@ -150,7 +150,7 @@ class QTableAgent(AgentBaseSmarter):
         
         return action
     
-    def update_q_table(self, time, state_cat, events):
+    def update_q_table(self, time, state_cat, events, evaluate=False):
         # 1. costs: cost of previous action and TODO cost of state age? 
         cost = self.cost_of_prev_action
         
@@ -161,8 +161,8 @@ class QTableAgent(AgentBaseSmarter):
                         or e.response_type == SensorResponse.CATALOG_STATE_UPDATE_NOMINAL):
                 reward += normalized_uncert_reward(e)
         
-        
-        self.q_table.update_q_table(self.prev_state_keys, self.prev_action_idx, reward-cost)
+        if not evaluate:
+            self.q_table.update_q_table(self.prev_state_keys, self.prev_action_idx, reward-cost)
         return reward-cost
           
     

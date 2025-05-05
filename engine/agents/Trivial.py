@@ -81,6 +81,7 @@ class RandomAgent(AgentBaseSmarter):
         """
         super().__init__(agent_id, assigned_sensors, assigned_satellites)
         self.do_nothing_rate = do_nothing_rate
+        self.is_rl_agent = False
 
     def decide(self, *args, **kwargs):
         """

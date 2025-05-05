@@ -17,6 +17,7 @@ class DynamicQTable:
         self.gamma = gamma
         self.alpha = alpha
         
+        
     def get_action_values(self, state_list):
         return reduce(operator.getitem, state_list, self.q_table)
     
@@ -52,6 +53,7 @@ class QTableAgent(AgentBaseSmarter):
     
     def __init__(self, agent_id, assigned_sensors, assigned_satellites, scenario_configs=Scenario(), epsilon=1, epsilon_dec=0.95, epsilon_min=0.05):
         super().__init__(agent_id, assigned_sensors, assigned_satellites, scenario_configs)
+        self.is_rl_agent = True
         self.agent_id = agent_id
         self.assigned_sensors = assigned_sensors
         self.assigned_satellites = assigned_satellites
@@ -59,6 +61,7 @@ class QTableAgent(AgentBaseSmarter):
         
         self.action_encoding = super().get_action_encoding()
         self.q_table = DynamicQTable(len(self.action_encoding))
+        
         
         
         self.last_seen_states = [0, 30, 60, 90, 120, 150, 180, 210] # make this dynamic

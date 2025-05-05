@@ -1,1 +1,1 @@
-# 1 RADAR 1 satellite, 6 hours (no maneuver)
+# 1 RADAR 1 satellite, 6 hours (no maneuvers)

@@ -12,23 +12,36 @@ from engine.util.time import  DEFAULT_SCENARIO_EPOCH
 from engine.util.indexing import dynamic_dict
 
 class Environment: 
-    def __init__(self, sensor_keys, sat_keys):
+    def __init__(self, sensor_keys, sat_keys, randomizer=None):
         ''''''
-        
-        self.scenario_configs=Scenario(DEFAULT_SCENARIO_EPOCH, 24.0)
+        self.randomizer = randomizer
+        if self.randomizer:
+            self.scenario_configs=Scenario(self.randomizer.get_epoch(), self.randomizer.get_scenario_length())   
+        else:
+            self.scenario_configs=Scenario()
         
         self.sensor_keys = sensor_keys
         self.sat_keys = sat_keys
+       
         
     
     def reset(self):
         ''''''
+        # randomize scenario
+        if self.randomizer:
+            self.scenario_configs=Scenario(self.randomizer.get_epoch(), self.randomizer.get_scenario_length())   
+        
         self.satellite_truth = {}
         for i, key in enumerate(self.sat_keys):
-            self.satellite_truth[key] = SatelliteTruth(key, TLE_LIBRARY[key][1], TLE_LIBRARY[key][2], self.scenario_configs, 13.3)
+            if self.randomizer:
+                re_epoch = self.randomizer.get_state_reepoch()
+            else:
+                re_epoch=1.5
+            self.satellite_truth[key] = SatelliteTruth(key, TLE_LIBRARY[key][1], TLE_LIBRARY[key][2], self.scenario_configs,re_epoch)
         
-        self.satellite_truth[self.sat_keys[1]].add_maneuvers([ManeuverDetails(10, 1.5, self.scenario_configs), ManeuverDetails(15.3, 4.15, self.scenario_configs)])
-        self.unique_maneuvers  = 2 
+        
+        #self.satellite_truth[self.sat_keys[1]].add_maneuvers([ManeuverDetails(10, 1.5, self.scenario_configs), ManeuverDetails(15.3, 4.15, self.scenario_configs)])
+        self.unique_maneuvers  = 0
         
         self.state_catalog = StateCatalog(self.satellite_truth)
         

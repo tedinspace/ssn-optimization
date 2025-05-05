@@ -9,6 +9,7 @@ class BasicRevisitAgent(AgentBaseSmarter):
         self.assigned_sensors = assigned_sensors
         self.assigned_satellites = assigned_satellites
         self.last_tasked = {}
+        self.is_rl_agent = False
         super().__init__(agent_id, assigned_sensors, assigned_satellites, scenario_configs)
                  
     def decide(self, time, state_cat):
@@ -38,3 +39,4 @@ class BasicRevisitAgent(AgentBaseSmarter):
     
     def reset(self):
         super().reset()
+        self.last_tasked = {}

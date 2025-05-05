@@ -160,7 +160,7 @@ class GroundSensor:
                 else:
                     task_messages_rejected.append(message)
             # reject for visibility
-            self.pipeline.drop_messages(SensorResponse.DROPPED_NOT_VISIBLE, task_messages_unvetted, time)
+            self.pipeline.drop_messages(SensorResponse.DROPPED_NOT_VISIBLE, task_messages_rejected, time)
             
             # TODO try to schedule vetted messages
             # TODO no scheduling if sensor is scheduled to be offline 

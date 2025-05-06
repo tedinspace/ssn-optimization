@@ -59,6 +59,10 @@ def socorro():
     '''
     return SensorInfo('socorro', [32.82, -106.66, 0], GroundSensorModality.OPTICS)
 
+def vandenberg():
+    # 34.7420° N, 120.5724° W
+    return SensorInfo('vandenberg',[34.7420, -120.5724, 0 ], GroundSensorModality.RADAR )
+
 def ssn():
     '''
     Returns a dictionary containing SensorInfo objects for various sensor locations.
@@ -78,7 +82,8 @@ def ssn():
         'holt': holt(), 
         'sst': sst(), 
         'maui': maui(), 
-        'socorro': socorro() 
+        'socorro': socorro(),
+        'vandenberg': vandenberg()
     }
 
 def load_sensor_map(sensor_keys, scenario_configs):

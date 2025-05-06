@@ -1,0 +1,1 @@
+# 1 RADAR 2 satellite, 12 hours (no maneuvers)

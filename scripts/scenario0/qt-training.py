@@ -5,46 +5,60 @@ from engine.agents.rl.QTableAgent import QTableAgent
 from engine.environment.bookkeeping.SimOutcomeTracker import SimOutcomeTracker
 from engine.util.plots import basic_ground_sensor_plot_v1, basic_uncertainty_plot
 
+
 EXPERIMENT_NAME = "S0"
-N_ROUNDS = 2
+
+BASE_PATH = './scripts/scenario0/'
+N_ROUNDS = 100
 
 sat_keys = ["AEHF 2"]
 sensor_keys = ['mhr']
 env = Environment(sensor_keys, sat_keys)
 
 
-sim_track = SimOutcomeTracker("q-table-training",sensor_keys, sat_keys, N_ROUNDS)
-Agents = [QTableAgent("test agent",sensor_keys, sat_keys)]
+AGENT = "q-table"
+Agents = [QTableAgent("AGENT",sensor_keys, sat_keys, env.scenario_configs )]
 
-env = Environment(sensor_keys, sat_keys, randomizer=Randomizer(scenario_length_hrs=[6,6])) # TODO not ideal reset
+
+sim_track = SimOutcomeTracker(EXPERIMENT_NAME+'-'+AGENT+"-train",sensor_keys, sat_keys, N_ROUNDS)
+
+env = Environment(sensor_keys, sat_keys, randomizer=Randomizer(scenario_length_hrs=[6,6])) 
 for i in range(N_ROUNDS):
     env.reset()
     t, state_cat,events_out, Done = env.reset()
-    Agents[0].reset()
-    Agents[0].decay_eps()
+    
+    for j in range(len(Agents)):
+        Agents[j].reset()
+        if Agents[j].is_rl_agent:
+             Agents[j].decay_eps()
+             print('eps-threshold',  Agents[j].eps_threshold)
+                         
+    
     TOTAL_REWARDS =0
     while Done ==False:
         # take actions
         actions = {}
         for agent in Agents:
-            actions[agent.agent_id]=agent.decide(t, state_cat)
+            action = agent.decide(t, state_cat)
+            actions[agent.agent_id] = action
+            
         # apply actions
         t, state_cat, events_out, Done = env.step(actions)
         
+        
         # update agent
         for agent in Agents:
-            TOTAL_REWARDS+= agent.update_q_table(t, state_cat, events_out)
+            if agent.is_rl_agent:
+                TOTAL_REWARDS+= agent.update_q_table(t, state_cat, events_out)
 
-    print(Agents[0].eps_threshold)
+    #print(Agents[0].eps_threshold)
     print("ROUND", i+1)
     print("REWARDS", TOTAL_REWARDS)
     sim_track.log_round(env,state_cat, TOTAL_REWARDS)
 
-#env.tracker.save_instance('./driver2.pkl')
-
-#sim_track.save_instance('./'+sim_track.id+'.pkl')
-#Agents[0].save('./q-table-agent-'+EXPERIMENT_NAME+'.pkl')
-#sim_track.save_instance('./q-table-train-results-exp0-v1.pkl')
+env.tracker.report()
+sim_track.save_instance(BASE_PATH+sim_track.id+'.pkl')
+Agents[0].save(BASE_PATH+'agent-'+AGENT+'-'+EXPERIMENT_NAME+'.pkl')
 
 
 basic_ground_sensor_plot_v1(env.tracker)

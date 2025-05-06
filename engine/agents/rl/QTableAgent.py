@@ -51,7 +51,11 @@ class DynamicQTable:
 
 class QTableAgent(AgentBaseSmarter):
     
-    def __init__(self, agent_id, assigned_sensors, assigned_satellites, scenario_configs=Scenario(), epsilon=1, epsilon_dec=0.95, epsilon_min=0.05):
+    def __init__(self, agent_id, assigned_sensors, assigned_satellites, scenario_configs=Scenario(), 
+                 epsilon=1, epsilon_dec=0.95, epsilon_min=0.05,
+                 last_seen_states_bins_mins = [0, 30, 60, 90, 120, 150, 180, 210],
+                 last_tasked_states_bins_mins = [-1, 30, 60, 90, 120, 150]
+                 ):
         super().__init__(agent_id, assigned_sensors, assigned_satellites, scenario_configs)
         self.is_rl_agent = True
         self.agent_id = agent_id
@@ -64,8 +68,8 @@ class QTableAgent(AgentBaseSmarter):
         
         
         
-        self.last_seen_states = [0, 30, 60, 90, 120, 150, 180, 210] # make this dynamic
-        self.last_tasked_states = [-1, 30, 60, 90, 120, 150]
+        self.last_seen_states = last_seen_states_bins_mins
+        self.last_tasked_states = last_tasked_states_bins_mins
         
         self.last_tasked_times = init_mapping(self.assigned_satellites, None)
         
@@ -80,7 +84,6 @@ class QTableAgent(AgentBaseSmarter):
         self.epsilon_dec = epsilon_dec
         self.epsilon_min = epsilon_min
         
-        self.state_age_penality = 75
         
         
     def save(self, file_with_path):
@@ -152,7 +155,7 @@ class QTableAgent(AgentBaseSmarter):
         self.prev_action_idx = action_idx
         self.prev_state_keys = state_keys
         #self.eps_threshold = max(self.epsilon_min, self.eps_threshold * self.epsilon_dec)
-        
+        #print(action)
         return action
     def decay_eps(self):
         self.eps_threshold = max(self.epsilon_min, self.eps_threshold * self.epsilon_dec)
@@ -167,7 +170,7 @@ class QTableAgent(AgentBaseSmarter):
         for e in events:
             if e.agent_id == self.agent_id and (e.response_type == SensorResponse.CATALOG_STATE_UPDATE_MANEUVER 
                         or e.response_type == SensorResponse.CATALOG_STATE_UPDATE_NOMINAL):
-                reward += normalized_uncert_reward(e)
+                reward += 6*normalized_uncert_reward(e)
         
         if not evaluate:
             self.q_table.update_q_table(self.prev_state_keys, self.prev_action_idx, reward-cost)
@@ -184,23 +187,18 @@ class QTableAgent(AgentBaseSmarter):
 def normalized_uncert_reward(message):
     return  max(0, (message.record.sigma_X_at_acq-message.record.sigma_dX)/(message.record.task_length_mins*60))
 
-def compute_tasking_cost(mins_ago, max_cost=10, min_cost=1, time_thresh_mins=35): # slope=max_cost-min)cost / (0-time_threshold_mins)
+def compute_tasking_cost(mins_ago, max_cost=1, min_cost=.1, time_thresh_mins=35): # slope=max_cost-min)cost / (0-time_threshold_mins)
     if mins_ago > time_thresh_mins:
         return min_cost
     else:
         return (max_cost-min_cost)/(0-time_thresh_mins)*mins_ago + max_cost
     
     
-def compute_state_age_cost(time, state_cat, beta=.1, threshold=90):
+def compute_state_age_cost(time, state_cat, beta=.01, threshold=60):
     cost = 0
     for sat_key in state_cat.current_catalog:
         last_seen_m = mins_ago(state_cat.current_catalog[sat_key].last_seen,time)
-        if last_seen_m > threshold:
-            #print(sat_key)
-            #print(last_seen_m)
-            c = beta*last_seen_m
-            #print(c)
-            cost+=c
+        cost+= max(0,beta*(last_seen_m-threshold))
     return cost
         
     

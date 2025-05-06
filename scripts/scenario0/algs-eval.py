@@ -15,7 +15,6 @@ N_ROUNDS = 100
 
 sat_keys = ["AEHF 2"]
 sensor_keys = ['mhr']
-env = Environment(sensor_keys, sat_keys)
 
 #AGENT = "revisit"
 #Agents = [BasicRevisitAgent(AGENT,sensor_keys, sat_keys)]
@@ -32,6 +31,7 @@ with open(BASE_PATH+"agent-q-table-S0.pkl", "rb") as f:
     q_table_agent = pickle.load(f)
     
 Agents = [q_table_agent]  
+
 
 
 sim_track = SimOutcomeTracker(EXPERIMENT_NAME+'-'+AGENT+"-eval",sensor_keys, sat_keys, N_ROUNDS)

@@ -2,14 +2,12 @@ from astropy import units
 
 from engine.environment.Scenario import Scenario
 from engine.environment.StateCatalog import StateCatalog
-from engine.environment.SatelliteTruth import SatelliteTruth, ManeuverDetails
+from engine.environment.SatelliteTruth import SatelliteTruth
 from engine.environment.sensors.Communication import SensorResponse
 from engine.environment.bookkeeping.EventTracker import EventTracker, Event
 from engine.builder.satellites.states import TLE_LIBRARY
 from engine.builder.sensors.ssn import load_sensor_map
-from engine.util.time import  DEFAULT_SCENARIO_EPOCH
 
-from engine.util.indexing import dynamic_dict
 
 class Environment: 
     def __init__(self, sensor_keys, sat_keys, randomizer=None):
@@ -39,8 +37,13 @@ class Environment:
                 re_epoch=1.5
             self.satellite_truth[key] = SatelliteTruth(key, TLE_LIBRARY[key][1], TLE_LIBRARY[key][2], self.scenario_configs,re_epoch)
         
+        if self.randomizer and self.randomizer.maneuver_details:
+            k2M = self.randomizer.randomize_maneuvers(self.sat_keys, self.scenario_configs)
+            for k in k2M:
+                self.satellite_truth[k].add_maneuvers(k2M[k])
+            #print(k2M)
+            
         
-        #self.satellite_truth[self.sat_keys[1]].add_maneuvers([ManeuverDetails(10, 1.5, self.scenario_configs), ManeuverDetails(15.3, 4.15, self.scenario_configs)])
         self.unique_maneuvers  = 0
         
         self.state_catalog = StateCatalog(self.satellite_truth)

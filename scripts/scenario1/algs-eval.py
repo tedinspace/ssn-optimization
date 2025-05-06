@@ -22,28 +22,30 @@ sensor_keys = ['mhr']
 #AGENT = "smart-random"
 #Agents = [RandomAgent(AGENT,sensor_keys, sat_keys)]
 
-#AGENT = "revisit"
-#Agents = [BasicRevisitAgent(AGENT,sensor_keys, sat_keys)]
+AGENT = "revisit"
+Agents = [BasicRevisitAgent(AGENT,sensor_keys, sat_keys)]
 
 
-AGENT = "q-table"
-with open(BASE_PATH+"agent-q-table-S1.pkl", "rb") as f:
-    q_table_agent = pickle.load(f)
+#AGENT = "q-table"
+#with open(BASE_PATH+"agent-q-table-S1.pkl", "rb") as f:
+#    q_table_agent = pickle.load(f)
     
-Agents = [q_table_agent]  
+#Agents = [q_table_agent]  
 
 
 
 sim_track = SimOutcomeTracker(EXPERIMENT_NAME+'-'+AGENT+"-eval",sensor_keys, sat_keys, N_ROUNDS)
 
-env = Environment(sensor_keys, sat_keys, randomizer=Randomizer(scenario_length_hrs=[6,6])) 
+env = Environment(sensor_keys, sat_keys, randomizer=Randomizer(scenario_length_hrs=[12,12])) 
 for i in range(N_ROUNDS):
     env.reset()
     t, state_cat,events_out, Done = env.reset()
     
+    for j in range(len(Agents)):
+        Agents[j].reset()
 
-                         
-    
+
+                            
     TOTAL_REWARDS =0
     while Done ==False:
         # take actions

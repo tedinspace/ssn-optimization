@@ -52,7 +52,7 @@ class DynamicQTable:
 class QTableAgent(AgentBaseSmarter):
     
     def __init__(self, agent_id, assigned_sensors, assigned_satellites, scenario_configs=Scenario(), 
-                 epsilon=1, epsilon_dec=0.95, epsilon_min=0.01,
+                 epsilon=1, epsilon_dec=0.95, epsilon_min=0.01, cost_scale = 100,
                  #last_seen_states_bins_mins = [0, 30, 60, 90, 120, 150, 180, 210, 300],
                  last_seen_states_bins_mins = list(range(0,400,30)),
                  #last_tasked_states_bins_mins = [-1, 30, 60, 90, 120, 150, 200, 300]
@@ -86,6 +86,7 @@ class QTableAgent(AgentBaseSmarter):
         self.epsilon_dec = epsilon_dec
         self.epsilon_min = epsilon_min
         
+        self.cost_scale = cost_scale
         
         
     def save(self, file_with_path):
@@ -164,7 +165,7 @@ class QTableAgent(AgentBaseSmarter):
         self.eps_threshold = max(self.epsilon_min, self.eps_threshold * self.epsilon_dec)
     def update_q_table(self, time, state_cat, events, evaluate=False):
         # 1. costs: cost of previous action and TODO cost of state age? 
-        cost = self.cost_of_prev_action/100
+        cost = self.cost_of_prev_action/self.cost_scale
         
         #cost+=  compute_state_age_cost(time, state_cat)
         
@@ -190,11 +191,17 @@ class QTableAgent(AgentBaseSmarter):
 def normalized_uncert_reward(message):
     return  max(0, (message.record.sigma_X_at_acq-message.record.sigma_dX)/(message.record.task_length_mins*60))
 
-def compute_tasking_cost(mins_ago, max_cost=0.005, min_cost=.0005, time_thresh_mins=45): # slope=max_cost-min)cost / (0-time_threshold_mins)
+
+
+def compute_tasking_cost(mins_ago, alpha_1=10, alpha_2=0.1, alpha_3=3, alpha_4=0.1):
+    return 1/alpha_1*np.exp(-1*alpha_2*mins_ago + alpha_3) + alpha_4
+    
+
+""" def compute_tasking_cost(mins_ago, max_cost=0.005, min_cost=.0005, time_thresh_mins=45): # slope=max_cost-min)cost / (0-time_threshold_mins)
     if mins_ago > time_thresh_mins:
         return min_cost
     else:
-        return (max_cost-min_cost)/(0-time_thresh_mins)*mins_ago + max_cost
+        return (max_cost-min_cost)/(0-time_thresh_mins)*mins_ago + max_cost """
     
     
 """ def compute_state_age_cost(time, state_cat, beta=.01, threshold=60):

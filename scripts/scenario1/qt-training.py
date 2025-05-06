@@ -9,7 +9,7 @@ from engine.util.plots import basic_ground_sensor_plot_v1, basic_uncertainty_plo
 EXPERIMENT_NAME = "S1"
 
 BASE_PATH = './scripts/scenario1/'
-N_ROUNDS = 50
+N_ROUNDS = 100
 
 sat_keys = ["AEHF 2", "AEHF 3"]
 sensor_keys = ['mhr']
@@ -22,7 +22,7 @@ Agents = [QTableAgent("AGENT",sensor_keys, sat_keys, env.scenario_configs )]
 
 sim_track = SimOutcomeTracker(EXPERIMENT_NAME+'-'+AGENT+"-train",sensor_keys, sat_keys, N_ROUNDS)
 
-env = Environment(sensor_keys, sat_keys, randomizer=Randomizer(scenario_length_hrs=[12,12])) 
+env = Environment(sensor_keys, sat_keys, randomizer=Randomizer(scenario_length_hrs=[24,24])) 
 for i in range(N_ROUNDS):
     env.reset()
     t, state_cat,events_out, Done = env.reset()

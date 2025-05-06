@@ -22,15 +22,15 @@ sensor_keys = ['mhr', 'ascension']
 #AGENT = "smart-random"
 #Agents = [RandomAgent(AGENT,sensor_keys, sat_keys)]
 
-AGENT = "revisit"
-Agents = [BasicRevisitAgent(AGENT,sensor_keys, sat_keys)]
+#AGENT = "revisit"
+#Agents = [BasicRevisitAgent(AGENT,sensor_keys, sat_keys)]
 
 
-#AGENT = "q-table"
-#with open(BASE_PATH+"agent-q-table-S1.pkl", "rb") as f:
-#    q_table_agent = pickle.load(f)
+AGENT = "q-table"
+with open(BASE_PATH+"agent-q-table-S2.pkl", "rb") as f:
+    q_table_agent = pickle.load(f)
     
-#Agents = [q_table_agent]  
+Agents = [q_table_agent]  
 
 
 

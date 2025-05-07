@@ -9,7 +9,7 @@ from engine.util.plots import basic_ground_sensor_plot_v1, basic_uncertainty_plo
 EXPERIMENT_NAME = "S1"
 
 BASE_PATH = './scripts/scenario1/'
-N_ROUNDS = 100
+N_ROUNDS = 50
 
 sat_keys = ["AEHF 2", "AEHF 3"]
 sensor_keys = ['mhr']
@@ -17,7 +17,9 @@ env = Environment(sensor_keys, sat_keys)
 
 
 AGENT = "DQN"
-Agents = [DQNAgent(AGENT, sensor_keys, sat_keys, env.scenario_configs, cost_scale=1/1.01 )]
+# SPARSE: 1/1.01, 1, 1.2, 1.3, 1.5, 2, 5, 9 | SPORTY: 10, 9.5
+Agents = [DQNAgent(AGENT, sensor_keys, sat_keys, env.scenario_configs, cost_scale=9.45 )] 
+
 
 
 sim_track = SimOutcomeTracker(EXPERIMENT_NAME+'-'+AGENT+"-train",sensor_keys, sat_keys, N_ROUNDS)

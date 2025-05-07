@@ -67,7 +67,7 @@ for i in range(N_ROUNDS):
                 if not IS_DQN:
                     TOTAL_REWARDS+= agent.update_q_table(t, state_cat, events_out, evaluate=True)
                 else:
-                    TOTAL_REWARDS+= agent.update(t, state_cat, events_out)
+                    TOTAL_REWARDS+= agent.update(t, state_cat, events_out, evaluate=True)
 
     #print(Agents[0].eps_threshold)
     print("ROUND", i+1)

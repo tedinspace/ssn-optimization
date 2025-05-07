@@ -25,7 +25,6 @@ gamma = 0.99
 batch_size = 64
 target_update_freq = 1000
 memory_size = 10000
-episodes = 1000
 
 
 

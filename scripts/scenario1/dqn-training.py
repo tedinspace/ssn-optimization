@@ -6,12 +6,12 @@ from engine.environment.bookkeeping.SimOutcomeTracker import SimOutcomeTracker
 from engine.util.plots import basic_ground_sensor_plot_v1, basic_uncertainty_plot
 
 
-EXPERIMENT_NAME = "S0"
+EXPERIMENT_NAME = "S1"
 
-BASE_PATH = './scripts/scenario0/'
+BASE_PATH = './scripts/scenario1/'
 N_ROUNDS = 100
 
-sat_keys = ["AEHF 2"]
+sat_keys = ["AEHF 2", "AEHF 3"]
 sensor_keys = ['mhr']
 env = Environment(sensor_keys, sat_keys)
 

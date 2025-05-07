@@ -6,13 +6,13 @@ from engine.environment.bookkeeping.SimOutcomeTracker import SimOutcomeTracker
 from engine.util.plots import basic_ground_sensor_plot_v1, basic_uncertainty_plot
 
 
-EXPERIMENT_NAME = "S0"
+EXPERIMENT_NAME = "S2"
 
-BASE_PATH = './scripts/scenario0/'
+BASE_PATH = './scripts/scenario2/'
 N_ROUNDS = 100
 
-sat_keys = ["AEHF 2"]
-sensor_keys = ['mhr']
+sat_keys = ["AEHF 1", "AEHF 2", "AEHF 3"]
+sensor_keys = ['mhr', 'ascension']
 env = Environment(sensor_keys, sat_keys)
 
 
@@ -22,16 +22,16 @@ Agents = [DQNAgent(AGENT, sensor_keys, sat_keys, env.scenario_configs, cost_scal
 
 sim_track = SimOutcomeTracker(EXPERIMENT_NAME+'-'+AGENT+"-train",sensor_keys, sat_keys, N_ROUNDS)
 
-env = Environment(sensor_keys, sat_keys, randomizer=Randomizer(scenario_length_hrs=[12,12])) 
-
+env = Environment(sensor_keys, sat_keys, randomizer=Randomizer(scenario_length_hrs=[12,12], 
+                                                               maneuver_details=["type1", [1,1], [1,2], [0.5,11]])) 
+steps_done = 0
 for i in range(N_ROUNDS):
     t, state_cat,events_out, Done = env.reset()
     
-   
-                         
+                     
     
     TOTAL_REWARDS =0
-    steps_done = 0
+    
     state = Agents[0].encode_state(t, state_cat)
     
     while Done ==False:

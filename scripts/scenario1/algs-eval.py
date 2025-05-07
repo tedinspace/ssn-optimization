@@ -26,19 +26,23 @@ sensor_keys = ['mhr']
 #Agents = [BasicRevisitAgent(AGENT,sensor_keys, sat_keys)]
 
 
-AGENT = "q-table"
-with open(BASE_PATH+"agent-q-table-S1.pkl", "rb") as f:
-    q_table_agent = pickle.load(f)
+#AGENT = "q-table"
+#with open(BASE_PATH+"agent-q-table-S1.pkl", "rb") as f:
+#    q_table_agent = pickle.load(f)
     
-Agents = [q_table_agent]  
+#Agents = [q_table_agent]  
 
-
+IS_DQN = True
+AGENT = "DQN"
+with open(BASE_PATH+"agent-DQN-S0.pkl", "rb") as f:
+    dqn_agent = pickle.load(f)
+    
+Agents = [dqn_agent]
 
 sim_track = SimOutcomeTracker(EXPERIMENT_NAME+'-'+AGENT+"-eval",sensor_keys, sat_keys, N_ROUNDS)
 
 env = Environment(sensor_keys, sat_keys, randomizer=Randomizer(scenario_length_hrs=[12,12])) 
 for i in range(N_ROUNDS):
-    env.reset()
     t, state_cat,events_out, Done = env.reset()
     
     for j in range(len(Agents)):
@@ -61,7 +65,10 @@ for i in range(N_ROUNDS):
         # update agent
         for agent in Agents:
             if agent.is_rl_agent:
-                TOTAL_REWARDS+= agent.update_q_table(t, state_cat, events_out, evaluate=True)
+                if not IS_DQN:
+                    TOTAL_REWARDS+= agent.update_q_table(t, state_cat, events_out, evaluate=True)
+                else:
+                    TOTAL_REWARDS+= agent.update(t, state_cat, events_out, evaluate=True)
 
     #print(Agents[0].eps_threshold)
     print("ROUND", i+1)

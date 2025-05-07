@@ -11,7 +11,7 @@ import pickle
 EXPERIMENT_NAME = "S3"
 
 BASE_PATH = './scripts/scenario3/'
-N_ROUNDS = 100
+N_ROUNDS = 1
 
 sat_keys = ["AEHF 1", "AEHF 2", "AEHF 3", "AEHF 4", "MUOS", "MUOS 3"]
 sensor_keys = ['mhr', 'ascension', 'socorro']
@@ -67,7 +67,10 @@ for i in range(N_ROUNDS):
         # update agent
         for agent in Agents:
             if agent.is_rl_agent:
-                TOTAL_REWARDS+= agent.update_q_table(t, state_cat, events_out, evaluate=True)
+                if not IS_DQN:
+                    TOTAL_REWARDS+= agent.update_q_table(t, state_cat, events_out, evaluate=True)
+                else:
+                    TOTAL_REWARDS+= agent.update(t, state_cat, events_out, evaluate=True)
 
     #print(Agents[0].eps_threshold)
     print("ROUND", i+1)

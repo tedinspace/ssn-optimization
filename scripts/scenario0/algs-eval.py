@@ -11,7 +11,7 @@ IS_DQN = False
 EXPERIMENT_NAME = "S0"
 
 BASE_PATH = './scripts/scenario0/'
-N_ROUNDS = 100
+N_ROUNDS = 1
 
 sat_keys = ["AEHF 2"]
 sensor_keys = ['mhr']
@@ -33,8 +33,8 @@ sensor_keys = ['mhr']
 #Agents = [q_table_agent]  
 
 IS_DQN = True
-AGENT = "DQN"
-with open(BASE_PATH+"agent-DQN-S0.pkl", "rb") as f:
+AGENT = "DQN-v2"
+with open(BASE_PATH+"agent-DQN-v2-S0.pkl", "rb") as f:
     dqn_agent = pickle.load(f)
     
 Agents = [dqn_agent]

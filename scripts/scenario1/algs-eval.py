@@ -34,7 +34,7 @@ sensor_keys = ['mhr']
 
 IS_DQN = True
 AGENT = "DQN"
-with open(BASE_PATH+"agent-DQN-S0.pkl", "rb") as f:
+with open(BASE_PATH+"agent-DQN-S1.pkl", "rb") as f:
     dqn_agent = pickle.load(f)
     
 Agents = [dqn_agent]

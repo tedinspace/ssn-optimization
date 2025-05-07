@@ -18,7 +18,7 @@ env = Environment(sensor_keys, sat_keys)
 
 
 AGENT = "DQN"
-Agents = [DQNAgent(AGENT, sensor_keys, sat_keys, env.scenario_configs, cost_scale=1/1.01 )]
+Agents = [DQNAgent(AGENT, sensor_keys, sat_keys, env.scenario_configs, cost_scale=1 )]
 
 
 sim_track = SimOutcomeTracker(EXPERIMENT_NAME+'-'+AGENT+"-train",sensor_keys, sat_keys, N_ROUNDS)

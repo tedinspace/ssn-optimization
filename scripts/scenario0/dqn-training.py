@@ -17,7 +17,7 @@ env = Environment(sensor_keys, sat_keys)
 
 
 AGENT = "DQN"
-Agents = [DQNAgent(AGENT, sensor_keys, sat_keys, env.scenario_configs )]
+Agents = [DQNAgent(AGENT, sensor_keys, sat_keys, env.scenario_configs, cost_scale=1/3 )]
 
 
 sim_track = SimOutcomeTracker(EXPERIMENT_NAME+'-'+AGENT+"-train",sensor_keys, sat_keys, N_ROUNDS)
@@ -43,7 +43,6 @@ for i in range(N_ROUNDS):
             
         # apply actions
         t, state_cat, events_out, Done = env.step(actions)
-        
         
         
         reward_round = 0

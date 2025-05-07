@@ -7,7 +7,7 @@ from engine.environment.bookkeeping.SimOutcomeTracker import SimOutcomeTracker
 from engine.util.plots import basic_ground_sensor_plot_v1, basic_uncertainty_plot
 import pickle
 
-
+IS_DQN = False
 EXPERIMENT_NAME = "S0"
 
 BASE_PATH = './scripts/scenario0/'
@@ -26,29 +26,30 @@ sensor_keys = ['mhr']
 #Agents = [RandomAgent(AGENT,sensor_keys, sat_keys)]
 
 
-AGENT = "q-table"
-with open(BASE_PATH+"agent-q-table-S0.pkl", "rb") as f:
-    q_table_agent = pickle.load(f)
+#AGENT = "q-table"
+#with open(BASE_PATH+"agent-q-table-S0.pkl", "rb") as f:
+#    q_table_agent = pickle.load(f)
     
-Agents = [q_table_agent]  
+#Agents = [q_table_agent]  
 
-
+IS_DQN = True
+AGENT = "DQN"
+with open(BASE_PATH+"agent-DQN-S0.pkl", "rb") as f:
+    dqn_agent = pickle.load(f)
+    
+Agents = [dqn_agent]
 
 sim_track = SimOutcomeTracker(EXPERIMENT_NAME+'-'+AGENT+"-eval",sensor_keys, sat_keys, N_ROUNDS)
 
 env = Environment(sensor_keys, sat_keys, randomizer=Randomizer(scenario_length_hrs=[6,6])) 
 for i in range(N_ROUNDS):
-    env.reset()
     t, state_cat,events_out, Done = env.reset()
     
     for j in range(len(Agents)):
         Agents[j].reset()
-        if Agents[j].is_rl_agent:
-             Agents[j].decay_eps()
-             print('eps-threshold',  Agents[j].eps_threshold)
                          
     
-    TOTAL_REWARDS =0
+    TOTAL_REWARDS =1
     while Done ==False:
         # take actions
         actions = {}
@@ -63,7 +64,10 @@ for i in range(N_ROUNDS):
         # update agent
         for agent in Agents:
             if agent.is_rl_agent:
-                TOTAL_REWARDS+= agent.update_q_table(t, state_cat, events_out, evaluate=True)
+                if not IS_DQN:
+                    TOTAL_REWARDS+= agent.update_q_table(t, state_cat, events_out, evaluate=True)
+                else:
+                    TOTAL_REWARDS+= agent.update(t, state_cat, events_out)
 
     #print(Agents[0].eps_threshold)
     print("ROUND", i+1)

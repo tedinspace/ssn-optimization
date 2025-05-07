@@ -20,10 +20,8 @@ __pycache__/
 
 # staged files 
 driver1.py
-poliastro-library-vetting.ipynb
-covariance.py
-function-tests.ipynb
-create-visuals.ipynb
-results.ipynb
+
+/scripts/drafts/
+
 
 *.pkl

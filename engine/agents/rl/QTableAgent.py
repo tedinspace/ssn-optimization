@@ -53,9 +53,7 @@ class QTableAgent(AgentBaseSmarter):
     
     def __init__(self, agent_id, assigned_sensors, assigned_satellites, scenario_configs=Scenario(), 
                  epsilon=1, epsilon_dec=0.95, epsilon_min=0.01, cost_scale = 100,
-                 #last_seen_states_bins_mins = [0, 30, 60, 90, 120, 150, 180, 210, 300],
                  last_seen_states_bins_mins = list(range(0,400,30)),
-                 #last_tasked_states_bins_mins = [-1, 30, 60, 90, 120, 150, 200, 300]
                  last_tasked_states_bins_mins = [-1]+ list(range(0,400,30)),
                  ):
         super().__init__(agent_id, assigned_sensors, assigned_satellites, scenario_configs)
@@ -72,7 +70,6 @@ class QTableAgent(AgentBaseSmarter):
         
         self.last_seen_states = last_seen_states_bins_mins
         self.last_tasked_states = last_tasked_states_bins_mins
-        
         self.last_tasked_times = init_mapping(self.assigned_satellites, None)
         
         # for update q-table

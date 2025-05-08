@@ -37,14 +37,15 @@ class Environment:
                 re_epoch=1.5
             self.satellite_truth[key] = SatelliteTruth(key, TLE_LIBRARY[key][1], TLE_LIBRARY[key][2], self.scenario_configs,re_epoch)
         
+        self.unique_maneuvers  = 0
         if self.randomizer and self.randomizer.maneuver_details:
             k2M = self.randomizer.randomize_maneuvers(self.sat_keys, self.scenario_configs)
             for k in k2M:
                 self.satellite_truth[k].add_maneuvers(k2M[k])
+                self.unique_maneuvers +=len(k2M[k])
             #print(k2M)
             
         
-        self.unique_maneuvers  = 0
         
         self.state_catalog = StateCatalog(self.satellite_truth)
         

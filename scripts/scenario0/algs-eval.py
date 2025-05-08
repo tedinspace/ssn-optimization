@@ -33,8 +33,8 @@ sensor_keys = ['mhr']
 #Agents = [q_table_agent]  
 
 IS_DQN = True
-AGENT = "DQN-v2"
-with open(BASE_PATH+"agent-DQN-v2-S0.pkl", "rb") as f:
+AGENT = "DQN"
+with open(BASE_PATH+"agent-DQN-S0.pkl", "rb") as f:
     dqn_agent = pickle.load(f)
     
 Agents = [dqn_agent]
@@ -75,7 +75,7 @@ for i in range(N_ROUNDS):
     sim_track.log_round(env,state_cat, TOTAL_REWARDS)
 
 env.tracker.report()
-sim_track.save_instance(BASE_PATH+sim_track.id+'.pkl')
+#sim_track.save_instance(BASE_PATH+sim_track.id+'.pkl')
 #Agents[0].save('./q-table-agent-'+EXPERIMENT_NAME+'.pkl')
 
 

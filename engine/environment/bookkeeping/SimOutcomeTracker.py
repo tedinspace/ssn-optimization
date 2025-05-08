@@ -14,6 +14,7 @@ class SimOutcomeTracker:
         self.uncertainty_prop = []
         self.unique_mans = []
         self.unique_obj = []
+        self.unique_mans_in_scenario = []
         self.tasks_issued = []
         self.state_updates =[]
         self.state_updates_nom = []
@@ -40,6 +41,7 @@ class SimOutcomeTracker:
         # 3. unique objects and maneuvers
         self.unique_mans.append(len(env.tracker.unique_mans))
         self.unique_obj.append(len(env.tracker.unique_sats))
+        self.unique_mans_in_scenario.append(env.unique_maneuvers)
         
         # 4. total tasks issued
         self.tasks_issued.append(env.tracker.pull_record(Event.TASKING_ISSUED))

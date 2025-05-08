@@ -17,7 +17,7 @@ env = Environment(sensor_keys, sat_keys)
 
 
 AGENT = "q-table"
-Agents = [QTableAgent("AGENT",sensor_keys, sat_keys, env.scenario_configs, cost_scale=100 )]
+Agents = [QTableAgent("AGENT",sensor_keys, sat_keys, env.scenario_configs, cost_scale=10 )]
 
 
 sim_track = SimOutcomeTracker(EXPERIMENT_NAME+'-'+AGENT+"-train",sensor_keys, sat_keys, N_ROUNDS)

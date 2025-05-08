@@ -11,7 +11,7 @@ import pickle
 EXPERIMENT_NAME = "S4"
 
 BASE_PATH = './scripts/scenario4/'
-N_ROUNDS = 1
+N_ROUNDS = 100
 
 sat_keys = ["AEHF 1", "AEHF 2", "AEHF 3", "AEHF 4", "MUOS", "MUOS 3", "MUOS 5", "GOES 1", "GOES 5", "GOES 6", "GOES 7", "AMC 3"]
 sensor_keys = ['mhr', 'ascension', 'socorro', 'vandenberg']

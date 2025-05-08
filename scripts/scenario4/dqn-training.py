@@ -6,19 +6,21 @@ from engine.environment.bookkeeping.SimOutcomeTracker import SimOutcomeTracker
 from engine.util.plots import basic_ground_sensor_plot_v1, basic_uncertainty_plot
 
 
-EXPERIMENT_NAME = "S3"
+EXPERIMENT_NAME = "S4"
 
-BASE_PATH = './scripts/scenario3/'
+BASE_PATH = './scripts/scenario4/'
 N_ROUNDS = 100
 
-sat_keys = ["AEHF 1", "AEHF 2", "AEHF 3", "AEHF 4", "MUOS", "MUOS 3"]
-sensor_keys = ['mhr', 'ascension', 'socorro']
+sat_keys = ["AEHF 1", "AEHF 2", "AEHF 3", "AEHF 4", "MUOS", "MUOS 3", "MUOS 5", "GOES 1", "GOES 5", "GOES 6", "GOES 7", "AMC 3"]
+sensor_keys = ['mhr', 'ascension', 'socorro', 'vandenberg']
+env = Environment(sensor_keys, sat_keys)
+
 
 env = Environment(sensor_keys, sat_keys)
 
 
 AGENT = "DQN"
-Agents = [DQNAgent(AGENT, sensor_keys, sat_keys, env.scenario_configs, cost_scale=10 )]
+Agents = [DQNAgent(AGENT, sensor_keys, sat_keys, env.scenario_configs, cost_scale=11 )]
 
 
 sim_track = SimOutcomeTracker(EXPERIMENT_NAME+'-'+AGENT+"-train",sensor_keys, sat_keys, N_ROUNDS)
